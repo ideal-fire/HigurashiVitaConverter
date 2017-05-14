@@ -12,13 +12,7 @@ namespace HigurashiVitaCovnerter {
 		const int type_old = 3;
 		int type = type_ps3;
 
-		void FixScriptFolders(){
-			
-		}
-		
-		public NotStatic(string StreamingAssetsNoEndSlash) {
-			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
-
+		void FixScriptFolders(string StreamingAssetsNoEndSlash){
 			if (Directory.Exists(StreamingAssetsNoEndSlash+"\\Update\\")==true){
 				Console.Out.WriteLine("Transfer Update to Scripts");
 				foreach(string file in Directory.GetFiles(StreamingAssetsNoEndSlash+"\\Update\\")){
@@ -27,6 +21,12 @@ namespace HigurashiVitaCovnerter {
 			}else{
 				Console.Out.WriteLine("...? There's no Update folder...");
 			}
+		}
+		
+		public NotStatic(string StreamingAssetsNoEndSlash) {
+			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
+
+			FixScriptFolders(StreamingAssetsNoEndSlash);
 				
 			//return;
 			Console.Out.WriteLine("========= SCRIPTS START ==========");
@@ -35,7 +35,7 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("========= IMAGES, START =========");
 			Console.Out.WriteLine("This may take a while, please wait warmly.");
 			//Console.ReadLine();
-			//return;
+			return;
 			for (int i = 0; i < folderEntries.Length; i++) {
 				//if (type == type_ps3) {
 					if (Path.GetFileNameWithoutExtension(folderEntries[i]) == "CG") {
@@ -76,9 +76,11 @@ namespace HigurashiVitaCovnerter {
 		}
 
 		string AddLastArg(string tofix) {
-			tofix = tofix.Substring(0, tofix.Length - 2);
-			tofix += "0 );";
-			Console.WriteLine("Fixed funkycall");
+			if (tofix.Substring(tofix.Length-4,4)==", );"){
+				tofix = tofix.Substring(0, tofix.Length - 2);
+				tofix += "0 );";
+				Console.WriteLine("Fixed funkycall");
+			}
 			return tofix;
 		}
 
@@ -90,6 +92,11 @@ namespace HigurashiVitaCovnerter {
 			for (int i = 0; i < lines.Length; i++) {
 				line = lines[i].TrimStart((char)09);
 
+				if (line.Length >= 4){
+					if (line.Substring(0,4)=="void"){
+						line = "function" + line.Substring(4,line.Length-4);
+					}
+				}
 				if (line.Length >= 11) {
 					if (line.Substring(0, 11) == "ShakeScreen") {
 						line = AddLastArg(line);
@@ -111,9 +118,17 @@ namespace HigurashiVitaCovnerter {
 					}
 				} else {
 					// Single char tests
-					if (line == "{" || line == "}") {
-						line = "";
-						Console.WriteLine("Fixed bracket");
+					if (line == "{") {
+						if (lines[i-1].Substring(0,2)=="if"){
+							line="then";
+						}else{
+							line="";
+						}
+						Console.WriteLine("Fixed left bracket");
+					}
+					if (line=="}"){
+						line="end";
+						Console.WriteLine("Fixed right bracket");
 					}
 				}
 
@@ -134,7 +149,7 @@ namespace HigurashiVitaCovnerter {
 				using (Bitmap currentFile = new Bitmap(fileEntries[i])) {
 					// image processing
 					if (currentFile != null) {
-						if (type == type_ps3) {
+						//if (type == type_ps3) {
 							// Is a background
 							if ((currentFile.Width == 1280 && currentFile.Height == 720) || (currentFile.Width==1920 && currentFile.Height == 1080)) {
 								Console.Out.WriteLine("(PS3) Background: {0}", fileEntries[i]);
@@ -151,7 +166,7 @@ namespace HigurashiVitaCovnerter {
 								happy.Dispose();
 								doneSomething=true;
 							}
-						} else if (type == type_updated) {
+						//} else if (type == type_updated) {
 							if (currentFile.Width == 1280 && currentFile.Height == 960) {
 								Console.Out.WriteLine("(Steam) Bust: {0}", fileEntries[i]);
 								Bitmap happy = new Bitmap(currentFile, new Size(640, 480));
@@ -160,7 +175,7 @@ namespace HigurashiVitaCovnerter {
 								happy.Dispose();
 								doneSomething=true;
 							}
-						}
+						//}
 
 					}
 					if (doneSomething==false){
