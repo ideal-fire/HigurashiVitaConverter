@@ -23,6 +23,12 @@ namespace HigurashiVitaCovnerter {
 				Console.Out.WriteLine("...? There's no Update folder...");
 			}
 		}
+
+		void CopyPresets(string StreamingAssetsNoEndSlash) {
+			foreach(string file in Directory.GetFiles(".\\PackagedPresets\\")){
+				File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"\\Presets\\", Path.GetFileName(file)),true);
+			}
+		}
 		
 		public NotStatic(string StreamingAssetsNoEndSlash) {
 			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
@@ -36,6 +42,18 @@ namespace HigurashiVitaCovnerter {
 			//return;
 
 			Console.Out.WriteLine("========= SCRIPTS DONE ==========");
+			Console.Out.WriteLine("========= PRESETS START =========");
+			if (Directory.Exists(".\\PackagedPresets\\") == true) {
+				Directory.CreateDirectory(StreamingAssetsNoEndSlash + "\\Presets");
+				CopyPresets(StreamingAssetsNoEndSlash);
+			} else {
+				Console.WriteLine("!!!!!!!!!! WARNINING !!!!!!!!!!!!!");
+				Console.Out.WriteLine("The folder PackagedPresets was not found in the same directory as this exe.\nIf you have misplaced the folder, please redownload the program.\nIf you ignore this warning, your StreamingAssets folder will have no presets in it by default.\nYou'll need to put them all in yourself.");
+				Console.WriteLine("!!!!!!!!!! WARNINING !!!!!!!!!!!!!");
+				Console.Out.WriteLine("==Press enter to continue==");
+				Console.ReadLine();
+			}
+			Console.Out.WriteLine("========= PRESETS END ===========");
 			Console.Out.WriteLine("========= IMAGES, START =========");
 			Console.Out.WriteLine("This may take a while, please wait warmly.");
 			//Console.ReadLine();
@@ -207,7 +225,8 @@ namespace HigurashiVitaCovnerter {
 		}
 
 		public static void FixImages(string folderpath, bool resaveanyway) {
-			
+			resaveanyway = true;
+
 			//string[] fileEntries = Directory.GetFiles(folderpath);
 			string[] fileEntries = Directory.GetFiles(folderpath, "*.*", SearchOption.AllDirectories);
 			for (int i = 0; i < fileEntries.Length; i++) {
@@ -268,6 +287,7 @@ namespace HigurashiVitaCovnerter {
 							happy.Dispose();
 							doneSomething = true;
 						} else if (resaveanyway == true) {
+							// Some images don't fade correctly for some reason. I don't know why, but a resave fixes it.
 							Console.Out.WriteLine("(No Reason) Resave: {0}", fileEntries[i]);
 							Bitmap happy = new Bitmap(currentFile, new Size(currentFile.Width, currentFile.Height));
 							currentFile.Dispose();
