@@ -48,7 +48,6 @@ Temporary Items
 
 
 #custom
-bin/
 obj/
 
 *.userprefs

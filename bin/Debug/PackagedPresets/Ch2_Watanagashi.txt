@@ -1,0 +1,121 @@
+022
+wata_001
+wata_002
+wata_003
+wata_004
+wata_005
+wata_006
+wata_007
+wata_008
+wata_009
+wata_009_02
+wata_010
+wata_010_02
+wata_010_03
+wata_010_04
+wata_011
+wata_011_02
+wata_012
+wata_012_02
+wata_012_03
+wata_ep_01
+wata_ep_02
+omake_02
+024
+wata_tips_01
+wata_tips_02
+wata_tips_03
+wata_tips_04
+wata_tips_05
+wata_tips_06
+wata_tips_07
+wata_tips_08
+wata_tips_09
+wata_tips_10
+wata_tips_11
+wata_tips_12
+wata_tips_13
+wata_tips_14
+wata_tips_15
+wata_tips_16
+wata_tips_17
+wata_tips_18
+wata_tips_19
+wata_tips_20
+wata_tips_21
+wata_tips_22
+wata_tips_23
+wata_tips_24
+022
+001
+003
+004
+005
+006
+006
+010
+013
+013
+016
+016
+018
+018
+022
+022
+024
+024
+024
+024
+024
+024
+024
+tipnames
+024
+Who's Mion's Uncle?
+Is There Really a Shion?
+An Introduction to Angel Mort
+It was Delicious
+Details of the Delinquent Three
+It Hasn't Been a While
+From the Scrapbook I
+From the Scrapbook II
+From the Scrapbook III
+Festival's Around the Corner
+From the Scrapbook IV
+From the Scrapbook V
+After the Festival
+From the Scrapbook VI
+From the Scrapbook VII
+Late-Night Phone Call
+From the Scrapbook VIII
+Their Punishment Isn't Over?
+From the Scrapbook IX
+The Elderly Leader of the Sonozaki Family?
+From the Scrapbook X
+Request Denied
+From the Scrapbook XI
+At the Suzu Mahjong Parlor
+chapternames
+022
+Watanagashi Day 1
+Watanagashi Day 2
+Watanagashi Day 3
+Watanagashi Day 4
+Watanagashi Day 5
+Watanagashi Day 6
+Watanagashi Day 7
+Watanagashi Day 8
+Watanagashi Day 9
+Watanagashi Day 9-2
+Watanagashi Day 10
+Watanagashi Day 10-2
+Watanagashi Day 10-3
+Watanagashi Day 10-4
+Watanagashi Day 11
+Watanagashi Day 11-2
+Watanagashi Day 12
+Watanagashi Day 12-2
+Watanagashi Day 12-3
+Watanagashi Epilogue 1
+Watanagashi Epilogue 2
+Watanagashi All-Cast Review Session

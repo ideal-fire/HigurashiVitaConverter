@@ -1,0 +1,114 @@
+023
+tata_001
+tata_002
+tata_003
+tata_004
+tata_005
+tata_008
+tata_008_02
+tata_009
+tata_009_02
+tata_010
+tata_010_02
+tata_010_03
+tata_010_04
+tata_011
+tata_011_02
+tata_011_03
+tata_012
+tata_013
+tata_013_02
+tata_014
+tata_ep01
+tata_ep02
+omake_03
+019
+tata_tips_01
+tata_tips_02
+tata_tips_03
+tata_tips_04
+tata_tips_05
+tata_tips_06
+tata_tips_07
+tata_tips_08
+tata_tips_09
+tata_tips_10
+tata_tips_11
+tata_tips_12
+tata_tips_13
+tata_tips_14
+tata_tips_15
+tata_tips_16
+tata_tips_17
+tata_tips_18
+tata_tips_19
+023
+001
+002
+003
+006
+008
+009
+009
+011
+011
+011
+014
+014
+015
+015
+015
+017
+019
+019
+019
+019
+019
+019
+019
+tipnames
+019
+Satoko's Trap Course (Elemetary)
+Satoko's Trap Course (Intermediate)
+Satoko's Trap Course (Advanced)
+The Slacking Manager
+Copy of the Preliminary Autopsy
+East Round Three
+Research Notes
+Ooishi's Post Memo
+Case 31
+Article
+Statistics from the Ministry of Health and Welfare
+Emergency
+D2-3 Number 44
+For the attention of those on the housewife slaughter incident case
+Fire from Hell
+Victim of the Fifth Year
+Inquiry Request
+Record of Malice
+Research Notes
+chapternames
+023
+Tatarigoroshi Day 1
+Tatarigoroshi Day 2
+Tatarigoroshi Day 3
+Tatarigoroshi Day 4
+Tatarigoroshi Day 5
+Tatarigoroshi Day 8
+Tatarigoroshi Day 8-2
+Tatarigoroshi Day 9
+Tatarigoroshi Day 9-2
+Tatarigoroshi Day 10
+Tatarigoroshi Day 10-2
+Tatarigoroshi Day 10-3
+Tatarigoroshi Day 10-4
+Tatarigoroshi Day 11
+Tatarigoroshi Day 11-2
+Tatarigoroshi Day 11-3
+Tatarigoroshi Day 12
+Tatarigoroshi Day 13
+Tatarigoroshi Day 13-2
+Tatarigoroshi Day 14
+Tatarigoroshi Epilogue 1
+Tatarigoroshi Epilogue 2
+Tatarigoroshi All-Cast Review Session
