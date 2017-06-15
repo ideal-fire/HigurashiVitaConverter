@@ -14,10 +14,10 @@ namespace HigurashiVitaCovnerter {
 		//int type = type_ps3;
 
 		void FixScriptFolders(string StreamingAssetsNoEndSlash){
-			if (Directory.Exists(StreamingAssetsNoEndSlash+"\\Update\\")==true){
+			if (Directory.Exists(StreamingAssetsNoEndSlash+"/Update/")==true){
 				Console.Out.WriteLine("Transfer Update to Scripts");
-				foreach(string file in Directory.GetFiles(StreamingAssetsNoEndSlash+"\\Update\\")){
-					File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"\\Scripts\\", Path.GetFileName(file)),true);
+				foreach(string file in Directory.GetFiles(StreamingAssetsNoEndSlash+"/Update/")){
+					File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"/Scripts/", Path.GetFileName(file)),true);
 				}
 			}else{
 				Console.Out.WriteLine("...? There's no Update folder...");
@@ -25,8 +25,8 @@ namespace HigurashiVitaCovnerter {
 		}
 
 		void CopyPresets(string StreamingAssetsNoEndSlash) {
-			foreach(string file in Directory.GetFiles(".\\PackagedPresets\\")){
-				File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"\\Presets\\", Path.GetFileName(file)),true);
+			foreach(string file in Directory.GetFiles("./PackagedPresets/")){
+				File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"/Presets/", Path.GetFileName(file)),true);
 			}
 		}
 		
@@ -37,14 +37,14 @@ namespace HigurashiVitaCovnerter {
 				
 			//return;
 			Console.Out.WriteLine("========= SCRIPTS START ==========");
-			FixScripts(StreamingAssetsNoEndSlash+"\\Scripts\\");
+			FixScripts(StreamingAssetsNoEndSlash+"/Scripts/");
 
 			//return;
 
 			Console.Out.WriteLine("========= SCRIPTS DONE ==========");
 			Console.Out.WriteLine("========= PRESETS START =========");
-			if (Directory.Exists(".\\PackagedPresets\\") == true) {
-				Directory.CreateDirectory(StreamingAssetsNoEndSlash + "\\Presets");
+			if (Directory.Exists("./PackagedPresets/") == true) {
+				Directory.CreateDirectory(StreamingAssetsNoEndSlash + "/Presets");
 				CopyPresets(StreamingAssetsNoEndSlash);
 			} else {
 				Console.WriteLine("!!!!!!!!!! WARNINING !!!!!!!!!!!!!");

@@ -14,14 +14,14 @@ namespace HigurashiVitaCovnerter {
 				}
 			}
 
-			if (Directory.Exists(".\\StreamingAssets") == false){
-				Console.Out.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!\nCould not find .\\StreamingAssets\\\n!!!!!!!!!!!!!!!!!!!!!!!");
+			if (Directory.Exists("./StreamingAssets") == false){
+				Console.Out.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!\nCould not find ./StreamingAssets/\n!!!!!!!!!!!!!!!!!!!!!!!");
 				Console.Out.WriteLine("You need to place the StreamingAssets folder in the same directory as this exe file.\nSee the thread for more clear instructions.");
 				Console.ReadLine();
 				return;
 			}
 
-			NotStatic athingiethatisntstatic = new NotStatic(".\\StreamingAssets");
+			NotStatic athingiethatisntstatic = new NotStatic("./StreamingAssets");
 			Console.Out.WriteLine("========= DONE! =========");
 			Console.Out.WriteLine("The conversion is done. You may close this window.");
 			Console.ReadLine();
