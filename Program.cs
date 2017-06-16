@@ -3,14 +3,34 @@ using System.IO;
 
 namespace HigurashiVitaCovnerter {
 	class MainClass {
+		public const string converterVersionString = "v1.2";
+		// 3 is v1.2
+		public const int converterVersionNumber = 3;
+		
+		public static bool IsRunningOnMono (){
+			return Type.GetType ("Mono.Runtime") != null;
+		}
+		
 		public static void Main(string[] args) {
+			if (IsRunningOnMono()==false){
+				// I don't really want to mess with this on Mono.
+				DisableConsoleQuickEdit.Go();
+			}else{
+				Console.Out.WriteLine("Detected Mono.");
+			}
+			
 			Console.WriteLine("Hello World!");
+			Console.Out.WriteLine("Higurashi-Vita script convertrer "+converterVersionString+" ("+converterVersionNumber+").");
 			if (args.Length == 2) {
-				if (args[0] == "pc") {
-					NotStatic.FixImages(args[1],true);
-					Console.Out.WriteLine("=== No reason resave complete ===");
-					Console.ReadLine();
-					return;
+				if (args[0].ToLower() == "ps3") {
+					Console.Out.WriteLine("Force PS3 conversion");
+					NotStatic.conversionType = NotStatic.type_ps3;
+				}else if (args[0].ToLower()=="steam"){
+					Console.Out.WriteLine("Force Steam conversion");
+					NotStatic.conversionType = NotStatic.type_steam;
+				}else{
+					Console.Out.WriteLine("Unknown command line argument "+args[0]);
+					NotStatic.conversionType = NotStatic.type_undefined;
 				}
 			}
 
@@ -20,9 +40,9 @@ namespace HigurashiVitaCovnerter {
 				Console.ReadLine();
 				return;
 			}
-
+			
 			NotStatic athingiethatisntstatic = new NotStatic("./StreamingAssets");
-			Console.Out.WriteLine("========= DONE! =========");
+			Console.Out.WriteLine("============= DONE! ==============");
 			Console.Out.WriteLine("The conversion is done. You may close this window.");
 			Console.ReadLine();
 		}

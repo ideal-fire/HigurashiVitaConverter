@@ -7,12 +7,13 @@ using System.Diagnostics;
 
 namespace HigurashiVitaCovnerter {
 	public class NotStatic {
-		//const int type_undefined = 0;
-		//const int type_ps3 = 1;
-		//const int type_updated = 2;
-		//const int type_old = 3;
-		//int type = type_ps3;
+		public const int type_undefined = 0;
+		public const int type_ps3 = 1;
+		public const int type_steam = 3;
+		public static int conversionType = type_undefined;
 
+		
+		
 		void FixScriptFolders(string StreamingAssetsNoEndSlash){
 			if (Directory.Exists(StreamingAssetsNoEndSlash+"/Update/")==true){
 				Console.Out.WriteLine("Transfer Update to Scripts");
@@ -30,12 +31,19 @@ namespace HigurashiVitaCovnerter {
 			}
 		}
 		
+		void DeleteIfExist(string filepath){
+			if (File.Exists(filepath)==true){
+				File.Delete(filepath);
+			}
+		}
+		
 		public NotStatic(string StreamingAssetsNoEndSlash) {
 			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
 
 			FixScriptFolders(StreamingAssetsNoEndSlash);
-				
+			
 			//return;
+			
 			Console.Out.WriteLine("========= SCRIPTS START ==========");
 			FixScripts(StreamingAssetsNoEndSlash+"/Scripts/");
 
@@ -54,8 +62,60 @@ namespace HigurashiVitaCovnerter {
 				Console.ReadLine();
 			}
 			Console.Out.WriteLine("========= PRESETS END ===========");
+			Console.Out.WriteLine("=========== MENU SFX ============");
+			if (File.Exists("./wa_038.ogg")==true){
+				if (File.Exists(StreamingAssetsNoEndSlash+"/SE/wa_038.ogg")){
+					File.Delete(StreamingAssetsNoEndSlash+"/SE/wa_038.ogg");
+				}
+				File.Copy("./wa_038.ogg",StreamingAssetsNoEndSlash+"/SE/wa_038.ogg");
+			}else{
+				Console.Out.WriteLine("Oh, the menu sound effect isn't here. Oh well.");
+			}
 			Console.Out.WriteLine("========= IMAGES, START =========");
 			Console.Out.WriteLine("This may take a while, please wait warmly.");
+			
+			
+			// Detect if PS3 patch or not
+			if (File.Exists(StreamingAssetsNoEndSlash+"/CG/re_se_de_a1.png")==true && conversionType==type_undefined){
+				using (Bitmap _tempRena = new Bitmap(StreamingAssetsNoEndSlash+"/CG/re_se_de_a1.png")){
+					if (_tempRena.Width==640 && _tempRena.Height==480){
+						Console.Out.WriteLine("Detected normal Higurashi");
+						conversionType = type_steam;
+					}else if (_tempRena.Width==1280 && _tempRena.Height == 960){
+						Console.Out.WriteLine("Detected PS3 Higurashi (Safe)");
+						conversionType = type_ps3;
+					}else if (_tempRena.Width==720 && _tempRena.Height==540){
+						conversionType = type_ps3;
+					}else{
+						//Console.Out.WriteLine("Detected PS3 Higurashi (Unsure)");
+						conversionType=type_undefined;
+					}
+					_tempRena.Dispose();
+				}
+			}else{
+				Console.Out.WriteLine("=== CONVERSION TYPE OVERRIDE ====");
+			}
+			
+			if (conversionType==type_undefined){
+				Console.Out.WriteLine("I'm not sure if you have the PS3 patch or not. Are you using the PS3 Voices & Graphics patch by 07th Modding? (y/n)");
+				string answer = Console.ReadLine();
+				do{
+					if (answer=="yes" || answer=="y"){
+						conversionType = type_ps3;
+						Console.Out.WriteLine("Set to PS3 patch Higurashi.");
+						answer="temp";
+					}else if (answer=="no" || answer=="n"){
+						conversionType = type_steam;
+						Console.Out.WriteLine("Set to normal Higurashi");
+						answer="temp";
+					}else{
+						Console.Out.WriteLine("Invalid answer "+answer+" please enter y or n");
+						Console.Out.WriteLine("I'm not sure if you have the PS3 patch or not. Are you using the PS3 Voices & Graphics patch by 07th Modding? (y/n)");
+						answer = Console.ReadLine();
+					}
+				}while (answer!="temp");
+			}
+			
 			//Console.ReadLine();
 			//return;
 			for (int i = 0; i < folderEntries.Length; i++) {
@@ -86,6 +146,17 @@ namespace HigurashiVitaCovnerter {
 					Directory.Delete(folderEntries[i], true);
 				}
 			}
+			Console.Out.WriteLine("Dating conversion");
+			using (StreamWriter sw = new StreamWriter(StreamingAssetsNoEndSlash+"/date.xxm0ronslayerxx")){
+				sw.WriteLine("Converted.");
+				sw.WriteLine(MainClass.converterVersionString);
+				sw.WriteLine(MainClass.converterVersionNumber);
+				sw.WriteLine("//MyLegGuyisanoob");
+				sw.WriteLine(DateTime.Now.ToString(@"MM\/dd\/yyyy h\:mm tt"));
+            }
+			Console.Out.WriteLine("====== DELETE USELESS STUFF ======");
+			DeleteIfExist(StreamingAssetsNoEndSlash+"/assetsreadme.txt");
+			DeleteIfExist(StreamingAssetsNoEndSlash+"/update.txt");
 
 		}
 
@@ -249,16 +320,15 @@ namespace HigurashiVitaCovnerter {
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
 							doneSomething = true;
-						} else if ((currentFile.Width == 960 && currentFile.Height == 720)) { // Is a ps3 bust
-							Console.Out.WriteLine("(PS3) Bust: {0}", fileEntries[i]);
-							Bitmap happy = new Bitmap(currentFile, new Size(640, 480));
-							currentFile.Dispose();
-							happy.Save(fileEntries[i]);
-							happy.Dispose();
-							doneSomething = true;
-						} else if (currentFile.Width == 1280 && currentFile.Height == 960) {
-							Console.Out.WriteLine("(Steam/PS3) Bust: {0}", fileEntries[i]);
-							Bitmap happy = new Bitmap(currentFile, new Size(640, 480));
+						}else if (currentFile.Width == 1280 && currentFile.Height == 960) {
+							Bitmap happy=null;
+							if (conversionType==type_steam){
+								Console.Out.WriteLine("(Steam) Bust: {0}", fileEntries[i]);
+								happy = new Bitmap(currentFile, new Size(640, 480));
+							}else if (conversionType==type_ps3){
+								Console.Out.WriteLine("(PS3) Bust: {0}", fileEntries[i]);
+								happy = new Bitmap(currentFile, new Size(720, 540));
+							}
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
