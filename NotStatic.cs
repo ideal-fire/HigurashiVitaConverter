@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Collections.Generic;
 using System.Collections;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using System.Net;
+using System.IO.Compression;
+using System.Threading;
 
 namespace HigurashiVitaCovnerter {
 	public class NotStatic {
@@ -11,38 +15,64 @@ namespace HigurashiVitaCovnerter {
 		public const int type_ps3 = 1;
 		public const int type_steam = 3;
 		public static int conversionType = type_undefined;
-
-		
-		
-		void FixScriptFolders(string StreamingAssetsNoEndSlash){
-			if (Directory.Exists(StreamingAssetsNoEndSlash+"/Update/")==true){
-				Console.Out.WriteLine("Transfer Update to Scripts");
-				foreach(string file in Directory.GetFiles(StreamingAssetsNoEndSlash+"/Update/")){
-					File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"/Scripts/", Path.GetFileName(file)),true);
-				}
-			}else{
-				Console.Out.WriteLine("...? There's no Update folder...");
-			}
-		}
-
-		void CopyPresets(string StreamingAssetsNoEndSlash) {
-			foreach(string file in Directory.GetFiles("./PackagedPresets/")){
-				File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"/Presets/", Path.GetFileName(file)),true);
-			}
-		}
-		
-		void DeleteIfExist(string filepath){
-			if (File.Exists(filepath)==true){
-				File.Delete(filepath);
-			}
-		}
 		
 		public NotStatic(string StreamingAssetsNoEndSlash) {
 			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
+			
+			// Detect if PS3 patch or not
+			if (conversionType==type_undefined){
+				if (File.Exists(StreamingAssetsNoEndSlash+"/CG/re_se_de_a1.png")==true){
+					using (Bitmap _tempRena = new Bitmap(StreamingAssetsNoEndSlash+"/CG/re_se_de_a1.png")){
+						if (_tempRena.Width==640 && _tempRena.Height==480){
+							Console.Out.WriteLine("Detected normal Higurashi");
+							conversionType = type_steam;
+						}else if (_tempRena.Width==1280 && _tempRena.Height == 960){
+							Console.Out.WriteLine("Detected PS3 Higurashi (Safe)");
+							conversionType = type_ps3;
+						}else if (_tempRena.Width==720 && _tempRena.Height==540){
+							conversionType = type_ps3;
+						}else{
+							//Console.Out.WriteLine("Detected PS3 Higurashi (Unsure)");
+							conversionType=type_undefined;
+						}
+						_tempRena.Dispose();
+					}
+				}else{
+					Console.Out.WriteLine("Can't find sample image.");
+				}
+			}else{
+				Console.Out.WriteLine("=== CONVERSION TYPE OVERRIDE ====");
+			}
+			
+			if (conversionType==type_undefined){
 
-			FixScriptFolders(StreamingAssetsNoEndSlash);
+				int answer = -1;
+				while (answer==-1){
+					DrawDivider();
+					Console.Out.WriteLine("I'm not sure if you have the PS3 patch or not. Are you using the PS3 Voices & Graphics patch by 07th Modding? (y/n)");
+					answer = YesOrNo();
+				}
+				
+				if (answer==1){
+					conversionType = type_ps3;
+					Console.Out.WriteLine("Set to PS3 patch Higurashi.");
+				}else if (answer==0){
+					conversionType = type_steam;
+					Console.Out.WriteLine("Set to normal Higurashi");
+				}else{
+					throw(new Exception("Invalid answer variable. Needs to be 1 or 0. It is "+answer));
+				}
+				
+			}
+
+			if (conversionType==type_ps3){
+				DownloadUpdateScripts(StreamingAssetsNoEndSlash);
+			}
 			
 			//return;
+			
+			// Copyes update to scripts
+			FixScriptFolders(StreamingAssetsNoEndSlash);
 			
 			Console.Out.WriteLine("========= SCRIPTS START ==========");
 			FixScripts(StreamingAssetsNoEndSlash+"/Scripts/");
@@ -67,54 +97,15 @@ namespace HigurashiVitaCovnerter {
 				if (File.Exists(StreamingAssetsNoEndSlash+"/SE/wa_038.ogg")){
 					File.Delete(StreamingAssetsNoEndSlash+"/SE/wa_038.ogg");
 				}
+				if (!Directory.Exists(StreamingAssetsNoEndSlash+"/SE")){
+					Directory.CreateDirectory(StreamingAssetsNoEndSlash+"/SE");
+				}
 				File.Copy("./wa_038.ogg",StreamingAssetsNoEndSlash+"/SE/wa_038.ogg");
 			}else{
 				Console.Out.WriteLine("Oh, the menu sound effect isn't here. Oh well.");
 			}
 			Console.Out.WriteLine("========= IMAGES, START =========");
 			Console.Out.WriteLine("This may take a while, please wait warmly.");
-			
-			
-			// Detect if PS3 patch or not
-			if (File.Exists(StreamingAssetsNoEndSlash+"/CG/re_se_de_a1.png")==true && conversionType==type_undefined){
-				using (Bitmap _tempRena = new Bitmap(StreamingAssetsNoEndSlash+"/CG/re_se_de_a1.png")){
-					if (_tempRena.Width==640 && _tempRena.Height==480){
-						Console.Out.WriteLine("Detected normal Higurashi");
-						conversionType = type_steam;
-					}else if (_tempRena.Width==1280 && _tempRena.Height == 960){
-						Console.Out.WriteLine("Detected PS3 Higurashi (Safe)");
-						conversionType = type_ps3;
-					}else if (_tempRena.Width==720 && _tempRena.Height==540){
-						conversionType = type_ps3;
-					}else{
-						//Console.Out.WriteLine("Detected PS3 Higurashi (Unsure)");
-						conversionType=type_undefined;
-					}
-					_tempRena.Dispose();
-				}
-			}else{
-				Console.Out.WriteLine("=== CONVERSION TYPE OVERRIDE ====");
-			}
-			
-			if (conversionType==type_undefined){
-				Console.Out.WriteLine("I'm not sure if you have the PS3 patch or not. Are you using the PS3 Voices & Graphics patch by 07th Modding? (y/n)");
-				string answer = Console.ReadLine();
-				do{
-					if (answer=="yes" || answer=="y"){
-						conversionType = type_ps3;
-						Console.Out.WriteLine("Set to PS3 patch Higurashi.");
-						answer="temp";
-					}else if (answer=="no" || answer=="n"){
-						conversionType = type_steam;
-						Console.Out.WriteLine("Set to normal Higurashi");
-						answer="temp";
-					}else{
-						Console.Out.WriteLine("Invalid answer "+answer+" please enter y or n");
-						Console.Out.WriteLine("I'm not sure if you have the PS3 patch or not. Are you using the PS3 Voices & Graphics patch by 07th Modding? (y/n)");
-						answer = Console.ReadLine();
-					}
-				}while (answer!="temp");
-			}
 			
 			//Console.ReadLine();
 			//return;
@@ -131,19 +122,19 @@ namespace HigurashiVitaCovnerter {
 
 				if (Path.GetFileNameWithoutExtension(folderEntries[i]) == "CompiledScripts") {
 					Console.Out.WriteLine("(All) Directory CompiledScripts not needed.");
-					Directory.Delete(folderEntries[i], true);
+					DeleteDirectoryRetry(folderEntries[i], true);
 				}
 				if (Path.GetFileNameWithoutExtension(folderEntries[i]) == "CompiledUpdateScripts") {
 					Console.Out.WriteLine("(All) Directory CompiledUpdateScripts not needed.");
-					Directory.Delete(folderEntries[i], true);
+					DeleteDirectoryRetry(folderEntries[i], true);
 				}
 				if (Path.GetFileNameWithoutExtension(folderEntries[i]) == "temp") {
 					Console.Out.WriteLine("(All) Directory temp not needed.");
-					Directory.Delete(folderEntries[i], true);
+					DeleteDirectoryRetry(folderEntries[i], true);
 				}
 				if (Path.GetFileNameWithoutExtension(folderEntries[i]) == "Update") {
 					Console.Out.WriteLine("(All) Directory Update no longer needed.");
-					Directory.Delete(folderEntries[i], true);
+					DeleteDirectoryRetry(folderEntries[i], true);
 				}
 			}
 			Console.Out.WriteLine("Dating conversion");
@@ -153,13 +144,253 @@ namespace HigurashiVitaCovnerter {
 				sw.WriteLine(MainClass.converterVersionNumber);
 				sw.WriteLine("//MyLegGuyisanoob");
 				sw.WriteLine(DateTime.Now.ToString(@"MM\/dd\/yyyy h\:mm tt"));
-            }
+			}
 			Console.Out.WriteLine("====== DELETE USELESS STUFF ======");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/assetsreadme.txt");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/update.txt");
 
 		}
+		
+		// Returns 1 for yes, 0 for no, -1 for invalid
+		int InputNumber(){
+			string answer = Console.ReadLine();
+			int _tempResult;
+			if (int.TryParse(answer, out _tempResult)==false){
+				Console.Out.WriteLine(answer + " is not a number. Try again.");
+				return -1;
+			}
+			return _tempResult;
+		}
+		
+		public static void DeleteDirectoryRetry(string destinationDir, bool stuffinsidediryesorno) {
+			const int maxRetry = 10;
+			for (var retries = 1; retries < maxRetry; retries++) {
+				try{
+					Directory.Delete(destinationDir, stuffinsidediryesorno);
+				}catch (DirectoryNotFoundException) {
+					return;	// The directory was deleted.
+				}catch (IOException){ // System.IO.IOException: The directory is not empty
+					Console.Out.WriteLine("Failed to delete "+destinationDir+". Retrying in 500 ms. Try "+retries+"/"+maxRetry);
+					Thread.Sleep(500);
+					continue;
+				}
+				return;
+			}
+			// depending on your use case, consider throwing an exception here
+		}
+				
+		// You can't enter negative numbers
+		// Returns -1 if they entered an invalid number
+		// Returns the number they entered otherwise
+		int YesOrNo(){
+			string answer = Console.ReadLine();
+			
+			if (answer=="yes" || answer=="y"){
+				return 1;
+			}else if (answer=="no" || answer=="n"){
+				return 0;
+			}else{
+				Console.Out.WriteLine("Invalid answer "+answer+" please enter \"y\" or \"n\" without quotations.");
+				return -1;
+			}
+		}
+		
+		public static void DrawDivider(){
+			Console.Out.WriteLine("==================================");
+		}
+		
+		void CopyDirToDir(string srcDirNoEndSlash, string destDirNoEndSlash){
+			Console.Out.WriteLine("Copy "+srcDirNoEndSlash+"/ to "+destDirNoEndSlash+"/");
+			
+			//Now Create all of the directories
+			foreach (string dirPath in Directory.GetDirectories(srcDirNoEndSlash, "*",  SearchOption.AllDirectories)){
+				Directory.CreateDirectory(dirPath.Replace(srcDirNoEndSlash, destDirNoEndSlash));
+			}
+			
+			//Copy all the files & Replaces any files with the same name
+			foreach (string newPath in Directory.GetFiles(srcDirNoEndSlash, "*.*",  SearchOption.AllDirectories))
+				File.Copy(newPath, newPath.Replace(srcDirNoEndSlash, destDirNoEndSlash), true);
+		}
+		
+		void DownloadUpdateScripts(string StreamingAssetsNoEndSlash){
+			int answer = -1;
+			while (answer==-1){
+				DrawDivider();
+				Console.Out.WriteLine("Because you are using the PS3 patches, you need to download the latest scripts from the Github repo.");
+				Console.Out.WriteLine("This is requiered for Onikakushi (ch1) and Watanagashi (ch2) to run correctly.");
+				Console.Out.WriteLine("It is optional for Tatarigoroshi (ch3) and Himatsubushi (ch4).");
+				Console.Out.WriteLine("Would you like me to download them for you? (y/n)");
+				answer = YesOrNo();
+			}
+			
+			if (answer==1){
+				Console.Out.WriteLine("Good answer!");
+			}else if (answer==0){
+				Console.Out.WriteLine("Okay. If you're converting chapters 1 or 2, you better have already done it yourself.");
+				return;
+			}else{
+				throw(new Exception("Invalid answer when it should have to be 1 or 0. It is "+answer.ToString()));
+			}
+			
+			// You can only get to this code if you choose yes
+			Console.Out.WriteLine("Loading url database...");
+			
+			List<string> databaseNameList = new List<string>();
+			List<string> databaseURLList = new List<string>();
+			
+			int counter = 0;
+			string line;
 
+			if (File.Exists("./RepoDatabase.txt")==false){
+				Console.Out.WriteLine("./RepoDatabase.txt not found!");
+			}
+			
+			// Read the file and display it line by line.
+			StreamReader file = new StreamReader("./RepoDatabase.txt");
+			while((line = file.ReadLine()) != null){
+				if (counter%2==0){
+					Console.WriteLine ("> Name: "+line);
+					databaseNameList.Add(line);
+				}else{
+					Console.WriteLine ("> URL: "+line);
+					databaseURLList.Add(line);
+				}
+				counter++;
+			}
+			file.Close();
+			
+			answer = -1;
+			while (answer<=0 || answer>(databaseNameList.Count+1) ){
+				if (answer>(databaseNameList.Count+1)){
+					DrawDivider();
+					Console.Out.WriteLine("That number is too high. Please enter the number in parentheses before the name.");
+				}
+				DrawDivider();
+				Console.Out.WriteLine("Select the game you're converting.");
+				for (int i=0;i<databaseNameList.Count;i++){
+					Console.Out.WriteLine("("+(i+1)+") "+databaseNameList[i]);
+				}
+				Console.Out.WriteLine("("+(databaseNameList.Count+1)+") My game isn't listed.");
+				answer = InputNumber();
+			}
+			
+			if (answer==databaseNameList.Count+1){
+				Console.Out.WriteLine("I don't know if you need the most up-to-date scripts. To be safe, I would download them manually. There's a text and video tutorial on the Wololo thread.");
+				Console.Out.WriteLine("If you press enter, the conversion will continue normally without the latest scripts. Close this window if you don't want that. CTRL+C for Mono");
+				Console.ReadLine();
+				return;
+			}
+			Console.Out.WriteLine("Good, you chose "+databaseNameList[answer-1]);
+			Console.Out.WriteLine("Trying to download the Github repo at "+databaseURLList[answer-1]+" to ./githubRepo.zip");
+			using (WebClient client = new WebClient()){
+				try{
+					client.DownloadFile(databaseURLList[answer-1], "./githubRepo.zip");
+				}catch(Exception e){
+					DrawDivider();
+					Console.Out.WriteLine("Failed to download the file. An error occurred. Here's the error:");
+					Console.Out.WriteLine(e.ToString());
+					DrawDivider();
+					Console.Out.WriteLine("Press enter to crash the program.");
+					Console.ReadLine();
+					throw(e);
+				}
+			}
+			if (!File.Exists("./githubRepo.zip")){
+				DrawDivider();
+				Console.Out.WriteLine("There were no errors, but the downloaded file just isn't there.");
+				DrawDivider();
+				Console.Out.WriteLine("Press enter to crash the program.");
+				Console.ReadLine();
+				throw(new Exception("The file just isn't there for some reason."));
+			}
+			DrawDivider();
+			Console.Out.WriteLine("Download complete. Extracting zip file...");
+			if (Directory.Exists("./githubRepoExtracted")){
+				Console.Out.WriteLine("Removing ./githubRepoExtracted");
+				DeleteDirectoryRetry("./githubRepoExtracted",true);
+			}
+			try{
+				ZipFile.ExtractToDirectory("./githubRepo.zip","./githubRepoExtracted");
+			}catch(Exception e){
+				DrawDivider();
+				DrawDivider();
+				DrawDivider();
+				Console.Out.WriteLine("There was a problem extracting ./githubRepo.zip. Here's the error:");
+				Console.Out.WriteLine(e.ToString());
+				DrawDivider();
+				if (MainClass.IsRunningOnMono()==true){
+					Console.Out.WriteLine("!!!!!!!!!!!!!!!!!!!");
+					Console.Out.WriteLine("Make sure Mono is updated!");
+					Console.Out.WriteLine("!!!!!!!!!!!!!!!!!!!");
+				}
+				Console.Out.WriteLine("You can extract the file yourself if you want. Press enter to crash the program or continue if you've extracted it yourself.");
+				Console.Out.WriteLine("If you want to extract the zip file yourself, extract ./githubRepo.zip to ./githubRepoExtracted. There should be a folder inside of ./githubRepoExtracted called chapterName-master");
+				DrawDivider();
+				Console.ReadLine();
+				if (!Directory.Exists("./githubRepoExtracted")){
+					throw(e);
+				}
+			}
+			DrawDivider();
+			Console.Out.WriteLine("Done extracting!");
+			Console.Out.WriteLine("Looking inside...");
+			string[] insideZipFolders = Directory.GetDirectories("./githubRepoExtracted");
+			if (insideZipFolders.Length==0){
+				Console.Out.WriteLine("For some reason, there are no directories in ./githubRepoExtracted!");
+				Console.Out.WriteLine("There should be at least one fodler which contains a script folder.");
+				Console.Out.WriteLine("Cannot continue. Press enter to crash!");
+				Console.ReadLine();
+				throw(new Exception("Nothing found in extracted zip directory."));
+			}
+			
+			string zipRootNoSlash = insideZipFolders[0];
+			DrawDivider();
+			Console.Out.WriteLine("Found "+zipRootNoSlash);
+			
+			Console.Out.WriteLine("Copying the ZIP's stuff to "+StreamingAssetsNoEndSlash+"/");
+			string[] insideZipFolderFolder = Directory.GetDirectories(zipRootNoSlash);
+			for (int i=0;i<insideZipFolderFolder.Length;i++){
+				Directory.CreateDirectory(StreamingAssetsNoEndSlash+"/"+Path.GetFileName(insideZipFolderFolder[i]));
+				CopyDirToDir(insideZipFolderFolder[i], StreamingAssetsNoEndSlash+"/"+Path.GetFileName((insideZipFolderFolder[i])));
+			}
+			DrawDivider();
+			Console.Out.WriteLine("Remove extracted ZIP...");
+			DeleteDirectoryRetry("./githubRepoExtracted",true);
+			
+			File.Delete("./githubRepo.zip");
+			
+			for (int i=0;i<4;i++){
+				DrawDivider();
+			}
+			
+			Console.Out.WriteLine("Done download updated stuff!");
+			
+		}
+
+		
+		void FixScriptFolders(string StreamingAssetsNoEndSlash){
+			if (Directory.Exists(StreamingAssetsNoEndSlash+"/Update/")==true){
+				Console.Out.WriteLine("Transfer Update to Scripts");
+				foreach(string file in Directory.GetFiles(StreamingAssetsNoEndSlash+"/Update/")){
+					File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"/Scripts/", Path.GetFileName(file)),true);
+				}
+			}else{
+				Console.Out.WriteLine("...? There's no Update folder...");
+			}
+		}
+
+		void CopyPresets(string StreamingAssetsNoEndSlash) {
+			foreach(string file in Directory.GetFiles("./PackagedPresets/")){
+				File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"/Presets/", Path.GetFileName(file)),true);
+			}
+		}
+		
+		void DeleteIfExist(string filepath){
+			if (File.Exists(filepath)==true){
+				File.Delete(filepath);
+			}
+		}
+		
 		void FixScripts(string folderpath) {
 			//string[] fileEntries = Directory.GetFiles(folderpath);
 			string[] fileEntries = Directory.GetFiles(folderpath, "*.*", SearchOption.AllDirectories);
@@ -194,7 +425,7 @@ namespace HigurashiVitaCovnerter {
 					continue;
 				}
 				if (line.Length >= 4){
-                    line = AddLastArg(line);
+					line = AddLastArg(line);
 					if (line.Substring(0,4)=="void"){
 						line = "function" + line.Substring(4,line.Length-4);
 					}

@@ -3,15 +3,18 @@ using System.IO;
 
 namespace HigurashiVitaCovnerter {
 	class MainClass {
-		public const string converterVersionString = "v1.2";
+		public const string converterVersionString = "v1.3";
+		public const string converterCompileTime = "6/23/17 7:19 PM";
 		// 3 is v1.2
-		public const int converterVersionNumber = 3;
+		// Version number is usually (x+1) where version string is (v1.x)
+		public const int converterVersionNumber = 4;
 		
-		public static bool IsRunningOnMono (){
+		public static bool IsRunningOnMono(){
 			return Type.GetType ("Mono.Runtime") != null;
 		}
 		
 		public static void Main(string[] args) {
+
 			if (IsRunningOnMono()==false){
 				// I don't really want to mess with this on Mono.
 				DisableConsoleQuickEdit.Go();
@@ -20,7 +23,7 @@ namespace HigurashiVitaCovnerter {
 			}
 			
 			Console.WriteLine("Hello World!");
-			Console.Out.WriteLine("Higurashi-Vita script convertrer "+converterVersionString+" ("+converterVersionNumber+").");
+			Console.Out.WriteLine("Higurashi-Vita Script Convertrer "+converterVersionString+" ("+converterVersionNumber+") "+converterCompileTime+".");
 			if (args.Length == 2) {
 				if (args[0].ToLower() == "ps3") {
 					Console.Out.WriteLine("Force PS3 conversion");
