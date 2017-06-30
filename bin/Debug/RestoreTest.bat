@@ -1,0 +1,1 @@
+xcopy /s /y "C:\Users\knoob\Desktop\Nathan\Programing\C#\HigurashiVitaCovnerter\bin\Debug\StreamingAssetsNormalTest" "C:\Users\knoob\Desktop\Nathan\Programing\C#\HigurashiVitaCovnerter\bin\Debug\StreamingAssets\"

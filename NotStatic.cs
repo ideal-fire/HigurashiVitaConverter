@@ -11,14 +11,131 @@ using System.Threading;
 
 namespace HigurashiVitaCovnerter {
 	public class NotStatic {
+		// .... This isn't really a big program. It's okay if I make everything public and static, right?
+		
+		
 		public const int type_undefined = 0;
 		public const int type_ps3 = 1;
 		public const int type_steam = 3;
 		public static int conversionType = type_undefined;
 		
+		public static int normalBustBackgroundWidth;
+		public static int normalBustBackgroundHeight;
+		
+		public static int ps3BustWidth;
+		public static int ps3BustHeight;
+		public static int ps3BackgroundWidth;
+		public static int ps3BackgroundHeight;
+		
+		public static double ratioNormalBustBackground;
+		public static double ratioPs3Background;
+		public static double ratioPs3Bust;
+		
+		public static int screenWidth=0;
+		public static int screenHeight=0;
+		
+		// Dividing by a smaller number gives a bigger result than dividing by a bigger a number
+		// Whichever one needs to stretch less is the one we stretch to
+		bool FitToWidth(int _imgWidth, int _imgHeight){
+			double _tempWidthResult = (double)_imgWidth/screenWidth;
+			double _tempHeightResult = (double)_imgHeight/screenHeight;
+			if (_tempWidthResult>_tempHeightResult){
+				return true;
+			}
+			return false;
+		}
+		
+		double ImageToScreenRatio(int _imgSize, int _screenSize){
+			return _imgSize/(double)_screenSize;
+		}
+		
+		int SizeScaledOutput(int _original, double _scaleFactor){
+			return (int)Math.Floor(_original/(double)_scaleFactor);
+		}
+		
 		public NotStatic(string StreamingAssetsNoEndSlash) {
 			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
 			
+			int _tempAnswer=-1;
+			
+			while (_tempAnswer<0 || _tempAnswer>2 ){
+				if (_tempAnswer>2){
+					DrawDivider();
+					Console.Out.WriteLine("That number is too high. Please enter the number in parentheses before the system name.");
+				}
+				DrawDivider();
+				Console.Out.WriteLine("What device are you converting files for?");
+				Console.Out.WriteLine("(0) PS Vita");
+				Console.Out.WriteLine("(1) Android Device");
+				Console.Out.WriteLine("(2) Custom Resolution");
+				_tempAnswer = InputNumber();
+			}
+			// Set the resolution for the user.
+			if (_tempAnswer==0){
+				screenWidth=640;
+				screenHeight=480;
+			}
+			if (_tempAnswer==2){
+				Console.Out.WriteLine("Custom resolution is the same as android. This will work for PS Vita AND Android.");
+			}
+			
+			// Ask the user for their screen resolution
+			if (screenWidth==0 || screenHeight ==0){
+				_tempAnswer=-1;
+				do{
+					Console.Out.WriteLine("Input the WIDTH of your device's screen in pixels");
+					_tempAnswer = InputNumber();
+				}while(_tempAnswer<=0);
+				screenWidth = _tempAnswer;
+				_tempAnswer=-1;
+				do{
+					Console.Out.WriteLine("Input the HEIGHT of your device's screen in pixels");
+					_tempAnswer = InputNumber();
+				}while(_tempAnswer<=0);
+				screenHeight = _tempAnswer;
+			}
+			
+			if (screenHeight>screenWidth){
+				Console.Out.WriteLine("I meant the resolution in LANDSCAPE mode. Whatever, I'll swap the values for you.");
+				int _tempInt;
+				_tempInt = screenWidth;
+				screenWidth = screenHeight;
+				screenHeight = _tempInt;
+			}
+			
+			Console.Out.WriteLine("Screen resolution {0}x{1} pixels.",screenWidth,screenHeight);
+			
+			// This block of code sets the value we multiply image sizes by depending on the image type
+			// If we're going to fit to width for normal backgrounds, busts, and updated busts
+			// The goal is to fit to the screen's width or height while keeping aspect ratio and not cutting anything off
+			if (FitToWidth(640,480)==true){
+				ratioNormalBustBackground = ImageToScreenRatio(640,screenWidth);
+			}else{
+				ratioNormalBustBackground = ImageToScreenRatio(480,screenHeight);
+			}
+			// If we're going to fit to width for ps3 backgrounds
+			if (FitToWidth(1920,1080)==true){
+				ratioPs3Background = ImageToScreenRatio(1920,screenWidth);
+			}else{
+				ratioPs3Background = ImageToScreenRatio(1080,screenHeight);
+			}
+			// We always need the ps3 busts to be as tall as the backgrounds
+			ratioPs3Bust = ImageToScreenRatio(960,ps3BackgroundHeight);
+			
+			
+			ps3BackgroundWidth = SizeScaledOutput(1920,ratioPs3Background);
+			ps3BackgroundHeight = SizeScaledOutput(1080,ratioPs3Background);
+			
+			normalBustBackgroundWidth = SizeScaledOutput(640,ratioNormalBustBackground);
+			normalBustBackgroundHeight = SizeScaledOutput(480,ratioNormalBustBackground);
+			
+			ps3BustWidth = SizeScaledOutput(1280,ratioPs3Bust);
+			ps3BustHeight = SizeScaledOutput(960,ratioPs3Bust);
+				                                
+			Console.Out.WriteLine("Old background & normal busts: {0}x{1}",normalBustBackgroundWidth,normalBustBackgroundHeight);
+			Console.Out.WriteLine("PS3 background: {0}x{1}",ps3BackgroundWidth,ps3BackgroundHeight);
+			Console.Out.WriteLine("PS3 busts: {0}x{1}",ps3BustWidth,ps3BustHeight);
+
 			// Detect if PS3 patch or not
 			if (conversionType==type_undefined){
 				if (File.Exists(StreamingAssetsNoEndSlash+"/CG/re_se_de_a1.png")==true){
@@ -151,7 +268,7 @@ namespace HigurashiVitaCovnerter {
 
 		}
 		
-		// Returns 1 for yes, 0 for no, -1 for invalid
+		// Returns the number the user put in. -1 otherwise
 		int InputNumber(){
 			string answer = Console.ReadLine();
 			int _tempResult;
@@ -275,8 +392,7 @@ namespace HigurashiVitaCovnerter {
 			}
 			
 			if (answer==databaseNameList.Count+1){
-				Console.Out.WriteLine("I don't know if you need the most up-to-date scripts. To be safe, I would download them manually. There's a text and video tutorial on the Wololo thread.");
-				Console.Out.WriteLine("If you press enter, the conversion will continue normally without the latest scripts. Close this window if you don't want that. CTRL+C for Mono");
+				Console.Out.WriteLine("Don't worry about it then.");
 				Console.ReadLine();
 				return;
 			}
@@ -527,6 +643,8 @@ namespace HigurashiVitaCovnerter {
 		}
 
 		public static void FixImages(string folderpath, bool resaveanyway) {
+			
+
 			resaveanyway = true;
 
 			//string[] fileEntries = Directory.GetFiles(folderpath);
@@ -544,50 +662,62 @@ namespace HigurashiVitaCovnerter {
 					if (currentFile != null) {
 						//if (type == type_ps3) {
 						// Is a background
-						if ((currentFile.Width == 1280 && currentFile.Height == 720) || (currentFile.Width == 1920 && currentFile.Height == 1080)) {
+						
+						// FOR ANY IMAGE THAT WE'RE UNSURE ABOUT, MAKE IT 640xSOMETHING!
+						
+						if ((currentFile.Width == 1280 && currentFile.Height == 720) || (currentFile.Width == 1920 && currentFile.Height == 1080)) { // 720p or 1080p is PS3 background
 							Console.Out.WriteLine("(PS3) Background: {0}", fileEntries[i]);
-							Bitmap happy = new Bitmap(currentFile, new Size(960, 540));
+							Bitmap happy = new Bitmap(currentFile, new Size(ps3BackgroundWidth, ps3BackgroundHeight));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
 							doneSomething = true;
-						}else if (currentFile.Width == 1280 && currentFile.Height == 960) {
+						}else if (currentFile.Width == 1280 && currentFile.Height == 960) { // 960p is a character bust
 							Bitmap happy=null;
 							if (conversionType==type_steam){
 								Console.Out.WriteLine("(Steam) Bust: {0}", fileEntries[i]);
-								happy = new Bitmap(currentFile, new Size(640, 480));
+								happy = new Bitmap(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
 							}else if (conversionType==type_ps3){
 								Console.Out.WriteLine("(PS3) Bust: {0}", fileEntries[i]);
-								happy = new Bitmap(currentFile, new Size(720, 540));
+								happy = new Bitmap(currentFile, new Size(ps3BustWidth, ps3BustHeight));
 							}
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
 							doneSomething = true;
-						} else if (currentFile.Width == 1024 && currentFile.Height == 768) {
+						} else if (currentFile.Width == 1024 && currentFile.Height == 768) { // Idk what this is, make it 640x480 just to be safe
 							Console.Out.WriteLine("(Wierd) Thingie: {0}", fileEntries[i]);
-							Bitmap happy = new Bitmap(currentFile, new Size(640, 480));
+							Bitmap happy = new Bitmap(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
 							doneSomething = true;
-						} else if (currentFile.Width==1920){
+						} else if (currentFile.Width==1920){ // Unknown. 
+							
 							Console.Out.WriteLine("(Unknown 1920) ???: {0}", fileEntries[i]);
 							//Bitmap happy = new Bitmap(currentFile, new Size(960, (int)Math.Floor((double)currentFile.Height/2)));
 							// We're actually going to save this as a 640x480 because we don't know if this is a sprite or not
 							Bitmap happy = new Bitmap(currentFile, new Size(640, (int)Math.Floor((double)currentFile.Height/3)));
+							
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
 							doneSomething = true;
-						} else if (currentFile.Width==1024){
+						} else if (currentFile.Width==1024){ // There is a sprite in Tatarigoroshi that scrolls up so it has a huge height. 
 							Console.Out.WriteLine("(Unknown 1024) ???: {0}", fileEntries[i]);
 							Bitmap happy = new Bitmap(currentFile, new Size(640, (int)Math.Floor((double)currentFile.Height/1.6)));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
 							doneSomething = true;
-						} else if (resaveanyway == true) {
+						}else if (currentFile.Width==640 && currentFile.Height==480){
+							Console.Out.WriteLine("(Old) Background/Bust: {0}", fileEntries[i]);
+							Bitmap happy = new Bitmap(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
+							currentFile.Dispose();
+							happy.Save(fileEntries[i]);
+							happy.Dispose();
+							doneSomething = true;
+						}else if (resaveanyway == true) {
 							// Some images don't fade correctly for some reason. I don't know why, but a resave fixes it.
 							Console.Out.WriteLine("(No Reason) Resave: {0}", fileEntries[i]);
 							Bitmap happy = new Bitmap(currentFile, new Size(currentFile.Width, currentFile.Height));
