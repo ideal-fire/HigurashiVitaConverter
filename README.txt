@@ -9,8 +9,5 @@ After it says the conversion is done, place the StreamingAssets folder at ux0:da
 Video tutorial:
 https://www.youtube.com/watch?v=0T8cxjXwwww
 
-Extra steps for PS3 patch:
-https://www.youtube.com/watch?v=__5R7MhskqI
-
 Wololo thread with more detailed instructions:
 http://wololo.net/talk/viewtopic.php?f=116&t=48223
