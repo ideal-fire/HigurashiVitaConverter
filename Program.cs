@@ -4,7 +4,7 @@ using System.IO;
 namespace HigurashiVitaCovnerter {
 	class MainClass {
 		public const string converterVersionString = "v1.4";
-		public const string converterCompileTime = "6/30/17 3:14 AM";
+		public const string converterCompileTime = "7/2/17 11:06 PM";
 		// 3 is v1.2
 		// Version number is usually (x+1) where version string is (v1.x)
 		public const int converterVersionNumber = 5;

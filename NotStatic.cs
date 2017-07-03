@@ -13,7 +13,6 @@ namespace HigurashiVitaCovnerter {
 	public class NotStatic {
 		// .... This isn't really a big program. It's okay if I make everything public and static, right?
 		
-		
 		public const int type_undefined = 0;
 		public const int type_ps3 = 1;
 		public const int type_steam = 3;
@@ -68,18 +67,20 @@ namespace HigurashiVitaCovnerter {
 				Console.Out.WriteLine("(0) PS Vita");
 				Console.Out.WriteLine("(1) Android Device");
 				Console.Out.WriteLine("(2) Custom Resolution");
+				Console.Out.Write("Answer: ");
 				_tempAnswer = InputNumber();
 			}
-			// Set the resolution for the user.
+			// Set the resolution for the user if they're on the Vita.
 			if (_tempAnswer==0){
-				screenWidth=640;
-				screenHeight=480;
+				screenWidth=960;
+				screenHeight=544;
 			}
-			if (_tempAnswer==2){
+			// Otherwise, they'll need to enter the resolution themself.
+			if (_tempAnswer==2){ // Just a little notice.
 				Console.Out.WriteLine("Custom resolution is the same as android. This will work for PS Vita AND Android.");
 			}
 			
-			// Ask the user for their screen resolution
+			// Ask the user for their screen resolution if it's not already set
 			if (screenWidth==0 || screenHeight ==0){
 				_tempAnswer=-1;
 				do{
@@ -120,18 +121,18 @@ namespace HigurashiVitaCovnerter {
 				ratioPs3Background = ImageToScreenRatio(1080,screenHeight);
 			}
 			// We always need the ps3 busts to be as tall as the backgrounds
-			ratioPs3Bust = ImageToScreenRatio(960,ps3BackgroundHeight);
-			
 			
 			ps3BackgroundWidth = SizeScaledOutput(1920,ratioPs3Background);
 			ps3BackgroundHeight = SizeScaledOutput(1080,ratioPs3Background);
+			
+			ratioPs3Bust = ImageToScreenRatio(960,ps3BackgroundHeight);
 			
 			normalBustBackgroundWidth = SizeScaledOutput(640,ratioNormalBustBackground);
 			normalBustBackgroundHeight = SizeScaledOutput(480,ratioNormalBustBackground);
 			
 			ps3BustWidth = SizeScaledOutput(1280,ratioPs3Bust);
 			ps3BustHeight = SizeScaledOutput(960,ratioPs3Bust);
-				                                
+
 			Console.Out.WriteLine("Old background & normal busts: {0}x{1}",normalBustBackgroundWidth,normalBustBackgroundHeight);
 			Console.Out.WriteLine("PS3 background: {0}x{1}",ps3BackgroundWidth,ps3BackgroundHeight);
 			Console.Out.WriteLine("PS3 busts: {0}x{1}",ps3BustWidth,ps3BustHeight);
@@ -221,6 +222,19 @@ namespace HigurashiVitaCovnerter {
 			}else{
 				Console.Out.WriteLine("Oh, the menu sound effect isn't here. Oh well.");
 			}
+			
+			if (File.Exists("./happy.lua")==true){
+				File.Copy("./happy.lua",StreamingAssetsNoEndSlash+"/happybackup.lua",true);
+				File.Copy("./happy.lua",StreamingAssetsNoEndSlash+"/happy.lua",true);
+			}else{
+				DrawDivider();
+				DrawDivider();
+				Console.Out.WriteLine("Oh, the happy.lua file isn't here. Oh well. YOU BETTER REMEMBER TO PUT IT THERE YOURSELF!");
+				Console.Out.WriteLine("THERE SHOULD BE A FILE CALLED happy.lua IN THE SAME DIRECTORY AS THIS EXE FILE. IF IT IS MISSING, REDOWNLOAD THE CONVERTER PROGRAM. IF IT'S STILL GONE, REPORT TO MYLEGGUY!");
+				DrawDivider();
+				DrawDivider();
+			}
+			
 			Console.Out.WriteLine("========= IMAGES, START =========");
 			Console.Out.WriteLine("This may take a while, please wait warmly.");
 			
@@ -255,6 +269,7 @@ namespace HigurashiVitaCovnerter {
 				}
 			}
 			Console.Out.WriteLine("Dating conversion");
+			DeleteIfExist(StreamingAssetsNoEndSlash+"/date.xxm0ronslayerxx");
 			using (StreamWriter sw = new StreamWriter(StreamingAssetsNoEndSlash+"/date.xxm0ronslayerxx")){
 				sw.WriteLine("Converted.");
 				sw.WriteLine(MainClass.converterVersionString);
