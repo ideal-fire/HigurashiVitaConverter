@@ -182,9 +182,11 @@ namespace HigurashiVitaCovnerter {
 				}
 				
 			}
-
-			if (conversionType==type_ps3){
-				DownloadUpdateScripts(StreamingAssetsNoEndSlash);
+			
+			if (Options.downloadLatestScripts==true){
+				if (conversionType==type_ps3){
+					DownloadUpdateScripts(StreamingAssetsNoEndSlash);
+				}
 			}
 			
 			//return;

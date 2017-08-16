@@ -35,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DisableConsoleQuickEdit.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="NotStatic.cs" />
