@@ -712,41 +712,28 @@ namespace HigurashiVitaCovnerter {
 						// in Lua, that will check if the variable noob isn't nil
 						// we need to change this to if (noob==1)
 						
-						// Check if there is no comparison stuff
-						if (line.IndexOf("=")==-1 && line.IndexOf(">")==-1 && line.IndexOf("<")==-1){
-							/*
-							
-							int lastLeftBracketPosition=line.IndexOf('('); // the position of the left bracket for if statement
-							int lastRightBracketPosition=0;
-							
-							int _tempFound;
-							
-							for (int j=0;;j++){
-								_tempFound = line.IndexOf('(',lastLeftBracketPosition+1);
-								if (_tempFound!=-1){
-									Console.Out.WriteLine("Okay, we'll need one more bracket.");
-									lastLeftBracketPosition=_tempFound;
-									additionalNeededRightBrackets+=1;
+						// Check for comparison operator in 'if' statement
+						int additionalNeededRightBrackets=0;
+						bool foundOperator=false;
+						for (int j=line.IndexOf("(")+1;j<line.Length;j++){
+							if (line.Substring(j,1)=="("){
+								additionalNeededRightBrackets+=1;
+							}else if (line.Substring(j,1)==")"){
+								additionalNeededRightBrackets-=1;
+								if (additionalNeededRightBrackets==-1){
+									foundOperator=false;
+									// end of 'if' statement
+									break;
 								}
-								_tempFound = line.IndexOf(')',lastRightBracketPosition);
-								if (_tempFound!=-1){
-									lastRightBracketPosition = _tempFound;
-									additionalNeededRightBrackets-=1;
-									if (additionalNeededRightBrackets==-1){
-										break;
-									}else{
-										Console.Out.WriteLine("Not this one, need {0} more",additionalNeededRightBrackets+1);
-									}
-								}else{
-									Console.Out.WriteLine("Oh, no. 'if' statement parse horror!");
-								}
+							}else if (line.Substring(j,1)=="=" || line.Substring(j,1)==">" || line.Substring(j,1)=="<"){
+								foundOperator=true;
+								break;
 							}
-							
-							Console.Out.WriteLine("tryna insert at {0}",lastRightBracketPosition);
-							line = line.Insert(lastRightBracketPosition,"==1");
-							*/
+						}
+						// If no operator, add ==1
+						if (foundOperator==false){
 							// Does not include the end one. 
-							int additionalNeededRightBrackets=0;
+							additionalNeededRightBrackets=0;
 							int foundEndIfBracketPosition=0;
 							for (int j=line.IndexOf("(")+1;j<line.Length;j++){
 								if (line.Substring(j,1)=="("){
@@ -759,7 +746,7 @@ namespace HigurashiVitaCovnerter {
 									}
 								}
 							}
-							line = line.Insert(foundEndIfBracketPosition,"==1");				
+							line = line.Insert(foundEndIfBracketPosition,"==1");
 						}
 					}
 				}
