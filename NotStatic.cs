@@ -538,16 +538,40 @@ namespace HigurashiVitaCovnerter {
 			}
 			return tofix;
 		}
+		
+		short GetNumberOfTabsAtStart(string line){
+			for (short i=0;i<line.Length;i++){
+				if (line.Substring(i,1)!=(""+(char)09)){
+					return i;
+				}
+			}
+			return (short)line.Length;
+		}
+		
+		string ChangeIfHere(string tomod, string evil_stuff_we_dont_want, string fresh_stuff_we_do_want){
+			if (tomod.TrimStart((char)09)==evil_stuff_we_dont_want){
+				return (char)09+fresh_stuff_we_do_want;
+			}else{
+				return tomod;
+			}
+		}
 
 		void FixSpecificScript(string filename) {
 			Console.Out.WriteLine("(All) Script: {0}",filename);
 			//string[] lines;
 			string[] lines = File.ReadAllLines(filename);
+			short[] tabsOnLines = new short[lines.Length];
 			string line;
+			string lastLine="";
 			bool marked = false;
 			for (int i = 0; i < lines.Length; i++) {
-				
+				tabsOnLines[i] = (short)GetNumberOfTabsAtStart(lines[i]);
 				line = lines[i].TrimStart((char)09);
+				
+				// This WILL change in the future. 
+				line = ChangeIfHere(line,"AdvMode = 1;", "AdvMode = 0;");
+				line = ChangeIfHere(line,"InitAdvMode = 1;", "InitAdvMode = 0;");
+				
 				if (line.Length == 0 && marked == false) {
 					line = "//MyLegGuyisanoob";
 					marked = true;
@@ -566,7 +590,8 @@ namespace HigurashiVitaCovnerter {
 							Console.Out.WriteLine("Fix char array "+line.Substring(5, line.IndexOf('[') - 5));
 							line = line.Substring(5, line.IndexOf('[') - 5) + " = {}";
 						}
-
+					}else if (line.Substring(0,3)=="int"){
+						line = "local "+line.Substring(3);
 					}
 				}
 				if (line.Length >= 11) {
@@ -615,22 +640,125 @@ namespace HigurashiVitaCovnerter {
 						}
 						Console.WriteLine("Fixed left bracket");
 					}else  if (line.Substring(0,1)=="}"){
-
-
-						if ((i + 1 < lines.Length) && lines[i + 1].Length>=4) {
-							lines[i + 1] = lines[i + 1].TrimStart((char)09);
-							if (lines[i + 1].Substring(0, 4) == "else") {
-								line = "";
-								Console.WriteLine("Fixed right bracket (ELSE)");
+						if (line.IndexOf("else")!=-1) {
+						    	line = "else";
+						}else{
+							if ((i + 1 < lines.Length) && lines[i + 1].Length>=4) {
+								lines[i + 1] = lines[i + 1].TrimStart((char)09);
+								if (lines[i + 1].Substring(0, 4) == "else") {
+									line = "";
+									Console.WriteLine("Fixed right bracket (ELSE)");
+								} else {
+									line = "end";
+									Console.WriteLine("Fixed right bracket (END)");
+								}
 							} else {
 								line = "end";
 								Console.WriteLine("Fixed right bracket (END)");
 							}
-						} else {
-							line = "end";
-							Console.WriteLine("Fixed right bracket (END)");
 						}
 
+					}
+				}
+				
+				if (line.Length>=2){
+					if (line.Substring(0,2)=="if"){
+						int _leftskwigilybraket = 0;
+
+						LeftSquigilyCheck:
+						//Console.Out.WriteLine("We start the search at {0}",_leftskwigilybraket);
+						_leftskwigilybraket = line.IndexOf("{",_leftskwigilybraket+1);
+						if (_leftskwigilybraket!=-1){
+							//Console.Out.WriteLine("Found left index at {0}",_leftskwigilybraket);
+							int _elseIndex = line.IndexOf("else");
+							if (( _elseIndex != -1 && _leftskwigilybraket<_elseIndex) || (_elseIndex==-1)){ // If there's an "else" don't draw if we're more to the left
+								line = SingleStringReplacePosition(line,"{"," then",_leftskwigilybraket);
+								goto LeftSquigilyCheck;
+							}else{
+								line = SingleStringReplacePosition(line,"{","",_leftskwigilybraket);
+								goto LeftSquigilyCheck;
+							}
+						}
+						
+						_leftskwigilybraket=0;
+						RightSquigilyCheck:
+						
+						_leftskwigilybraket = line.IndexOf("}",_leftskwigilybraket+1);
+						if (_leftskwigilybraket!=-1){
+							int _elseIndex = line.IndexOf("else");
+							if (( _elseIndex != -1 && _leftskwigilybraket>_elseIndex) || (_elseIndex==-1)){ // If there's an "else" don't draw if we're more to the left
+								line = SingleStringReplacePosition(line,"}"," end",_leftskwigilybraket+1);
+								goto RightSquigilyCheck;
+							}else{
+								line = SingleStringReplacePosition(line,"}","",_leftskwigilybraket+1);
+								goto RightSquigilyCheck;
+							}
+						}
+						
+						// then fix for single line if statements
+						if (line.IndexOf("then")==-1){
+							// If the next line is }, don't add "then"
+							if ( !( (i!=lines.Length-1) && (lines[i+1].TrimStart((char)09).Length>=1) && (lines[i+1].TrimStart((char)09)).Substring(0,1)=="{") ){
+								line = line + " then";
+							}
+						}
+
+
+						// In c and stuff
+						// if (noob)
+						// checks if noob is 1
+						// in Lua, that will check if the variable noob isn't nil
+						// we need to change this to if (noob==1)
+						
+						// Check if there is no comparison stuff
+						if (line.IndexOf("=")==-1 && line.IndexOf(">")==-1 && line.IndexOf("<")==-1){
+							/*
+							
+							int lastLeftBracketPosition=line.IndexOf('('); // the position of the left bracket for if statement
+							int lastRightBracketPosition=0;
+							
+							int _tempFound;
+							
+							for (int j=0;;j++){
+								_tempFound = line.IndexOf('(',lastLeftBracketPosition+1);
+								if (_tempFound!=-1){
+									Console.Out.WriteLine("Okay, we'll need one more bracket.");
+									lastLeftBracketPosition=_tempFound;
+									additionalNeededRightBrackets+=1;
+								}
+								_tempFound = line.IndexOf(')',lastRightBracketPosition);
+								if (_tempFound!=-1){
+									lastRightBracketPosition = _tempFound;
+									additionalNeededRightBrackets-=1;
+									if (additionalNeededRightBrackets==-1){
+										break;
+									}else{
+										Console.Out.WriteLine("Not this one, need {0} more",additionalNeededRightBrackets+1);
+									}
+								}else{
+									Console.Out.WriteLine("Oh, no. 'if' statement parse horror!");
+								}
+							}
+							
+							Console.Out.WriteLine("tryna insert at {0}",lastRightBracketPosition);
+							line = line.Insert(lastRightBracketPosition,"==1");
+							*/
+							// Does not include the end one. 
+							int additionalNeededRightBrackets=0;
+							int foundEndIfBracketPosition=0;
+							for (int j=line.IndexOf("(")+1;j<line.Length;j++){
+								if (line.Substring(j,1)=="("){
+									additionalNeededRightBrackets+=1;
+								}else if (line.Substring(j,1)==")"){
+									additionalNeededRightBrackets-=1;
+									if (additionalNeededRightBrackets==-1){
+										foundEndIfBracketPosition=j;
+										break;
+									}
+								}
+							}
+							line = line.Insert(foundEndIfBracketPosition,"==1");				
+						}
 					}
 				}
 
@@ -648,8 +776,18 @@ namespace HigurashiVitaCovnerter {
 					}
 				}
 				
+				if (i>=2){
+					if (tabsOnLines[i]<tabsOnLines[i-1] && !(line.Length>=4 && line.Substring(0,4)=="else")){
+						if ((lines[i-2].Length>=2) && lines[i-2].Substring(0,2)=="if"){
+							if (line!="end"){
+								line = "end "+line;
+							}
+						}
+					}
+				}
 
 				lines[i] = line;
+				lastLine = lines[i];
 			}
 
 			File.WriteAllLines(filename, lines);
@@ -657,6 +795,12 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("(Done)");
 		}
 
+		string SingleStringReplacePosition(string original, string tofind,string newthing, int minoffset){
+			int cpos = original.IndexOf(tofind);
+			original = original.Substring(0,cpos)+newthing+original.Substring(cpos+1,original.Length-(cpos+1));
+			return original;
+		}
+		
 		public static void FixImages(string folderpath, bool resaveanyway) {
 			
 
