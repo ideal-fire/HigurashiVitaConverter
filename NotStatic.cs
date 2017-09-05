@@ -566,6 +566,7 @@ namespace HigurashiVitaCovnerter {
 			string line;
 			string lastLine="";
 			bool marked = false;
+			List<bool> explicitThens = new List<bool>();
 			for (int i = 0; i < lines.Length; i++) {
 				tabsOnLines[i] = (short)GetNumberOfTabsAtStart(lines[i]);
 				line = lines[i].TrimStart((char)09);
@@ -574,7 +575,7 @@ namespace HigurashiVitaCovnerter {
 				line = ChangeIfHere(line,"AdvMode = 1;", "AdvMode = 0;");
 				line = ChangeIfHere(line,"InitAdvMode = 1;", "InitAdvMode = 0;");
 				
-				if (line.Length == 0 && marked == false) {
+				if (marked == false && line.Length == 0 ) {
 					line = "//MyLegGuyisanoob";
 					marked = true;
 					lines[i] = line;
@@ -640,7 +641,8 @@ namespace HigurashiVitaCovnerter {
 						}else{
 							line="";
 						}
-						Console.WriteLine("Fixed left bracket");
+						Console.WriteLine("Fixed left bracket (Explicit)");
+						explicitThens.Add(true);
 					}else  if (line.Substring(0,1)=="}"){
 						if (line.IndexOf("else")!=-1) {
 						    	line = "else";
@@ -651,10 +653,12 @@ namespace HigurashiVitaCovnerter {
 									line = "";
 									Console.WriteLine("Fixed right bracket (ELSE)");
 								} else {
+									explicitThens.RemoveAt(explicitThens.Count-1);
 									line = "end";
 									Console.WriteLine("Fixed right bracket (END)");
 								}
 							} else {
+								explicitThens.RemoveAt(explicitThens.Count-1);
 								line = "end";
 								Console.WriteLine("Fixed right bracket (END)");
 							}
@@ -663,6 +667,7 @@ namespace HigurashiVitaCovnerter {
 					}
 				}
 				
+				// If statement fixing and array subscript fixing
 				if (line.Length>=2){
 					if (line.Substring(0,2)=="if"){
 						int _leftskwigilybraket = 0;
@@ -675,8 +680,9 @@ namespace HigurashiVitaCovnerter {
 							int _elseIndex = line.IndexOf("else");
 							if (( _elseIndex != -1 && _leftskwigilybraket<_elseIndex) || (_elseIndex==-1)){ // If there's an "else" don't draw if we're more to the left
 								line = SingleStringReplacePosition(line,"{"," then",_leftskwigilybraket);
+								explicitThens.Add(true);
 								goto LeftSquigilyCheck;
-							}else{
+							}else{ // if this after an "else", just remove it
 								line = SingleStringReplacePosition(line,"{","",_leftskwigilybraket);
 								goto LeftSquigilyCheck;
 							}
@@ -690,6 +696,7 @@ namespace HigurashiVitaCovnerter {
 							int _elseIndex = line.IndexOf("else");
 							if (( _elseIndex != -1 && _leftskwigilybraket>_elseIndex) || (_elseIndex==-1)){ // If there's an "else" don't draw if we're more to the left
 								line = SingleStringReplacePosition(line,"}"," end",_leftskwigilybraket+1);
+								explicitThens.RemoveAt(explicitThens.Count-1);
 								goto RightSquigilyCheck;
 							}else{
 								line = SingleStringReplacePosition(line,"}","",_leftskwigilybraket+1);
@@ -702,6 +709,7 @@ namespace HigurashiVitaCovnerter {
 							// If the next line is }, don't add "then"
 							if ( !( (i!=lines.Length-1) && (lines[i+1].TrimStart((char)09).Length>=1) && (lines[i+1].TrimStart((char)09)).Substring(0,1)=="{") ){
 								line = line + " then";
+								explicitThens.Add(false);
 							}
 						}
 
@@ -764,10 +772,10 @@ namespace HigurashiVitaCovnerter {
 
 					}
 				}
-				
+				// Try to fix if statements that don't have any brackets
 				if (i>=2){
-					if (tabsOnLines[i]<tabsOnLines[i-1] && !(line.Length>=4 && line.Substring(0,4)=="else")){
-						if ((lines[i-2].Length>=2) && lines[i-2].Substring(0,2)=="if"){
+					if (tabsOnLines[i]<tabsOnLines[i-1] && !(line.Length>=4 && line.Substring(0,4)=="else")){ // If this has less tabs than the last one and this isn't an "else" line
+						if ((lines[i-2].Length>=2) && lines[i-2].Substring(0,2)=="if" && explicitThens[explicitThens.Count-1]==false){
 							if (line!="end"){
 								line = "end "+line;
 							}
