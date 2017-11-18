@@ -568,6 +568,7 @@ namespace HigurashiVitaCovnerter {
 			bool marked = false;
 			List<bool> explicitThens = new List<bool>();
 			for (int i = 0; i < lines.Length; i++) {
+				//Console.Out.WriteLine("Line " + i.ToString());
 				tabsOnLines[i] = (short)GetNumberOfTabsAtStart(lines[i]);
 				line = lines[i].TrimStart((char)09);
 				
@@ -611,6 +612,7 @@ namespace HigurashiVitaCovnerter {
 						return;
 					}
 				}
+				// Fix things that should be string args.
 				if (line.Length >= 13) {
 					if ((line.Substring(0, 13) == "SetGlobalFlag" || line.IndexOf("GetGlobalFlag")!=-1) || (line.Length>=22 && line.IndexOf("LoadValueFromLocalWork")!=-1)) {
 						int start = 3;
