@@ -56,7 +56,7 @@ namespace HigurashiVitaCovnerter {
 			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
 			
 			int _tempAnswer=-1;
-			
+			int _userDeviceTarget;
 			while (_tempAnswer<0 || _tempAnswer>2 ){
 				if (_tempAnswer>2){
 					DrawDivider();
@@ -65,19 +65,20 @@ namespace HigurashiVitaCovnerter {
 				DrawDivider();
 				Console.Out.WriteLine("What device are you converting files for?");
 				Console.Out.WriteLine("(0) PS Vita");
-				Console.Out.WriteLine("(1) Android Device");
-				Console.Out.WriteLine("(2) Custom Resolution");
+				Console.Out.WriteLine("(1) 3ds");
+				Console.Out.WriteLine("(2) Android Device");
 				Console.Out.Write("Answer: ");
 				_tempAnswer = InputNumber();
 			}
+			_userDeviceTarget=_tempAnswer;
 			// Set the resolution for the user if they're on the Vita.
 			if (_tempAnswer==0){
 				screenWidth=960;
 				screenHeight=544;
 			}
-			// Otherwise, they'll need to enter the resolution themself.
-			if (_tempAnswer==2){ // Just a little notice.
-				Console.Out.WriteLine("Custom resolution is the same as android. This will work for PS Vita AND Android.");
+			if (_tempAnswer==1){
+				screenWidth=400;
+				screenHeight=240;
 			}
 			
 			// Ask the user for their screen resolution if it's not already set
@@ -183,6 +184,10 @@ namespace HigurashiVitaCovnerter {
 				
 			}
 			
+			if (File.Exists("./GameSpecificAdvBox.png")){
+				Console.Out.WriteLine("Copy ADV box.");
+				File.Copy("./GameSpecificAdvBox.png",Path.Combine("./StreamingAssets/","GameSpecificAdvBox.png"),true);
+			}
 			if (Options.downloadLatestScripts==true){
 				if (conversionType==type_ps3){
 					DownloadUpdateScripts(StreamingAssetsNoEndSlash);
@@ -201,12 +206,15 @@ namespace HigurashiVitaCovnerter {
 
 			Console.Out.WriteLine("========= SCRIPTS DONE ==========");
 			Console.Out.WriteLine("========= PRESETS START =========");
-			if (Directory.Exists("./PackagedPresets/") == true) {
-				Directory.CreateDirectory(StreamingAssetsNoEndSlash + "/Presets");
-				CopyPresets(StreamingAssetsNoEndSlash);
+			if (Directory.Exists(Options.includedPresetsFolderName) == true) {
+				// Only copy presets if it's PS Vita
+				if (_userDeviceTarget==0){
+					Directory.CreateDirectory(StreamingAssetsNoEndSlash + "/Presets");
+					CopyPresets(StreamingAssetsNoEndSlash);
+				}
 			} else {
 				Console.WriteLine("!!!!!!!!!! WARNINING !!!!!!!!!!!!!");
-				Console.Out.WriteLine("The folder PackagedPresets was not found in the same directory as this exe.\nIf you have misplaced the folder, please redownload the program.\nIf you ignore this warning, your StreamingAssets folder will have no presets in it by default.\nYou'll need to put them all in yourself.");
+				Console.Out.WriteLine("The folder \"Presets\" was not found in the same directory as this exe.\nIf you have misplaced the folder, please redownload the program.\nIf you ignore this warning, your StreamingAssets folder will have no presets in it by default.\nYou'll need to put them all in yourself.");
 				Console.WriteLine("!!!!!!!!!! WARNINING !!!!!!!!!!!!!");
 				Console.Out.WriteLine("==Press enter to continue==");
 				Console.ReadLine();
@@ -225,8 +233,9 @@ namespace HigurashiVitaCovnerter {
 				Console.Out.WriteLine("Oh, the menu sound effect isn't here. Oh well.");
 			}
 			
+			/*
 			if (File.Exists("./happy.lua")==true){
-				File.Copy("./happy.lua",StreamingAssetsNoEndSlash+"/happybackup.lua",true);
+				//File.Copy("./happy.lua",StreamingAssetsNoEndSlash+"/happybackup.lua",true);
 				File.Copy("./happy.lua",StreamingAssetsNoEndSlash+"/happy.lua",true);
 			}else{
 				DrawDivider();
@@ -235,7 +244,7 @@ namespace HigurashiVitaCovnerter {
 				Console.Out.WriteLine("THERE SHOULD BE A FILE CALLED happy.lua IN THE SAME DIRECTORY AS THIS EXE FILE. IF IT IS MISSING, REDOWNLOAD THE CONVERTER PROGRAM. IF IT'S STILL GONE, REPORT TO MYLEGGUY!");
 				DrawDivider();
 				DrawDivider();
-			}
+			}*/
 			
 			Console.Out.WriteLine("========= IMAGES, START =========");
 			Console.Out.WriteLine("This may take a while, please wait warmly.");
@@ -513,7 +522,7 @@ namespace HigurashiVitaCovnerter {
 		}
 
 		void CopyPresets(string StreamingAssetsNoEndSlash) {
-			foreach(string file in Directory.GetFiles("./PackagedPresets/")){
+			foreach(string file in Directory.GetFiles(Options.includedPresetsFolderName)){
 				File.Copy(file, Path.Combine(StreamingAssetsNoEndSlash+"/Presets/", Path.GetFileName(file)),true);
 			}
 		}
