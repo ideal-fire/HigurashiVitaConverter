@@ -3,11 +3,11 @@ using System.IO;
 
 namespace HigurashiVitaCovnerter {
 	class MainClass {
-		public const string converterVersionString = "v1.6.1"; // DON'T FORGET TO CHANGE converterVersionNumber
-		public const string converterCompileTime = "12/3/17 9:07 PM";
+		public const string converterVersionString = "v1.6.3"; // DON'T FORGET TO CHANGE converterVersionNumber
+		public const string converterCompileTime = "12/10/17";
 		// 3 is v1.2
 		// Version number is usually (x+1) where version string is (v1.x)
-		public const int converterVersionNumber = 7;
+		public const int converterVersionNumber = 8;
 		
 		public static bool IsRunningOnMono(){
 			return Type.GetType ("Mono.Runtime") != null;

@@ -16,5 +16,9 @@ namespace HigurashiVitaCovnerter
 		public static bool downloadLatestScripts=false;
 		
 		public const string includedPresetsFolderName = "./Presets/";
+		
+		public static bool isSecretFeature = false;
+		
+		public static bool promptADVMode = true;
 	}
 }

@@ -33,9 +33,11 @@ namespace HigurashiVitaCovnerter {
 		public static int screenWidth=0;
 		public static int screenHeight=0;
 		
+		public static bool isADVMode=false;
+		
 		// Dividing by a smaller number gives a bigger result than dividing by a bigger a number
 		// Whichever one needs to stretch less is the one we stretch to
-		bool FitToWidth(int _imgWidth, int _imgHeight){
+		static bool FitToWidth(int _imgWidth, int _imgHeight){
 			double _tempWidthResult = (double)_imgWidth/screenWidth;
 			double _tempHeightResult = (double)_imgHeight/screenHeight;
 			if (_tempWidthResult>_tempHeightResult){
@@ -44,17 +46,16 @@ namespace HigurashiVitaCovnerter {
 			return false;
 		}
 		
-		double ImageToScreenRatio(int _imgSize, int _screenSize){
+		static double ImageToScreenRatio(int _imgSize, int _screenSize){
 			return _imgSize/(double)_screenSize;
 		}
 		
-		int SizeScaledOutput(int _original, double _scaleFactor){
+		static int SizeScaledOutput(int _original, double _scaleFactor){
 			return (int)Math.Floor(_original/(double)_scaleFactor);
 		}
 		
 		public NotStatic(string StreamingAssetsNoEndSlash) {
 			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
-			
 			int _tempAnswer=-1;
 			int _userDeviceTarget;
 			while (_tempAnswer<0 || _tempAnswer>2 ){
@@ -164,7 +165,6 @@ namespace HigurashiVitaCovnerter {
 			}
 			
 			if (conversionType==type_undefined){
-
 				int answer = -1;
 				while (answer==-1){
 					DrawDivider();
@@ -184,14 +184,39 @@ namespace HigurashiVitaCovnerter {
 				
 			}
 			
-			if (File.Exists("./GameSpecificAdvBox.png")){
-				Console.Out.WriteLine("Copy ADV box.");
-				File.Copy("./GameSpecificAdvBox.png",Path.Combine("./StreamingAssets/","GameSpecificAdvBox.png"),true);
-			}
-			if (Options.downloadLatestScripts==true){
-				if (conversionType==type_ps3){
-					DownloadUpdateScripts(StreamingAssetsNoEndSlash);
+			if (conversionType == type_ps3){
+				if (Options.promptADVMode){
+					int answer = -1;
+					while (answer==-1){
+						DrawDivider();
+						Console.Out.WriteLine("ADV mode presents text like a regular visual novel would, in a textbox at the bottom of the screen. The disadvantage is that you can see less text at once.");
+						Console.Out.WriteLine("Would you like to enable ADV mode? (y/n)");
+						answer = YesOrNo();
+					}
+					if (answer==1){
+						isADVMode=true;
+					}
 				}
+				if (File.Exists("./GameSpecificAdvBoxDEFAULT.png") && File.Exists("./GameSpecificAdvBox3DS.png")){
+					Console.Out.WriteLine("Copy ADV box.");
+					File.Copy("./GameSpecificAdvBoxDEFAULT.png",(StreamingAssetsNoEndSlash+"/GameSpecificAdvBoxDEFAULT.png"),true);
+					File.Copy("./GameSpecificAdvBox3DS.png",(StreamingAssetsNoEndSlash+"/GameSpecificAdvBox3DS.png"),true);
+				}
+				if (Options.downloadLatestScripts==true){
+					if (conversionType==type_ps3){
+						DownloadUpdateScripts(StreamingAssetsNoEndSlash);
+					}
+				}
+			}
+			
+			
+			if (isADVMode==true){
+				FileStream fp = File.Open(StreamingAssetsNoEndSlash+"/Scripts/_GameSpecific.lua",FileMode.Create);
+				StreamWriter sw =new StreamWriter(fp);
+				sw.WriteLine("OptionsSetTextMode(TEXTMODE_AVD);");
+				sw.WriteLine("OptionsLoadADVBox();");
+				sw.Close();
+				sw.Dispose();
 			}
 			
 			//return;
@@ -322,9 +347,9 @@ namespace HigurashiVitaCovnerter {
 			// depending on your use case, consider throwing an exception here
 		}
 				
-		// You can't enter negative numbers
-		// Returns -1 if they entered an invalid number
-		// Returns the number they entered otherwise
+		// Returns 1 if user inputs "y" or "yes"
+		// Returns 0 if user inputs "n" or "no"
+		// Returns -1 otherwise
 		int YesOrNo(){
 			string answer = Console.ReadLine();
 			
@@ -581,9 +606,11 @@ namespace HigurashiVitaCovnerter {
 				tabsOnLines[i] = (short)GetNumberOfTabsAtStart(lines[i]);
 				line = lines[i].TrimStart((char)09);
 				
-				// This WILL change in the future. 
-				line = ChangeIfHere(line,"AdvMode = 1;", "AdvMode = 0;");
-				line = ChangeIfHere(line,"InitAdvMode = 1;", "InitAdvMode = 0;");
+				if (isADVMode==false){
+					// This WILL change in the future. 
+					line = ChangeIfHere(line,"AdvMode = 1;", "AdvMode = 0;");
+					line = ChangeIfHere(line,"InitAdvMode = 1;", "InitAdvMode = 0;");
+				}
 				
 				if (marked == false && line.Length == 0 ) {
 					line = "//MyLegGuyisanoob";
@@ -880,6 +907,19 @@ namespace HigurashiVitaCovnerter {
 						}else if (currentFile.Width==640 && currentFile.Height==480){
 							Console.Out.WriteLine("(Old) Background/Bust: {0}", fileEntries[i]);
 							Bitmap happy = new Bitmap(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
+							currentFile.Dispose();
+							happy.Save(fileEntries[i]);
+							happy.Dispose();
+							doneSomething = true;
+						}else if (Options.isSecretFeature==true && currentFile.Width==800 && currentFile.Height==600){
+							Console.Out.WriteLine("(Test Game) Image: {0}", fileEntries[i]);
+							double _tempRatio;
+							if (FitToWidth(currentFile.Width,currentFile.Height)==true){
+								_tempRatio = ImageToScreenRatio(currentFile.Width,screenWidth);
+							}else{
+								_tempRatio = ImageToScreenRatio(currentFile.Height,screenHeight);
+							}
+							Bitmap happy = new Bitmap(currentFile, new Size(SizeScaledOutput(currentFile.Width,_tempRatio), SizeScaledOutput(currentFile.Height,_tempRatio)));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
