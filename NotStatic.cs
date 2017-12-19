@@ -272,7 +272,7 @@ namespace HigurashiVitaCovnerter {
 			}*/
 			
 			Console.Out.WriteLine("========= IMAGES, START =========");
-			Console.Out.WriteLine("This may take a while, please wait warmly.");
+			Console.Out.WriteLine("This may take a while, please wait.");
 			
 			//Console.ReadLine();
 			//return;
@@ -836,6 +836,16 @@ namespace HigurashiVitaCovnerter {
 			return original;
 		}
 		
+		
+		public static Bitmap goodResizeImage(Bitmap _sourceImage, Size _newSize){
+			Bitmap _resultBitmap = new Bitmap(_newSize.Width,_newSize.Height);
+			using (Graphics goodGraphics = Graphics.FromImage(_resultBitmap)){
+                goodGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+                goodGraphics.DrawImage(_sourceImage,0,0,_newSize.Width,_newSize.Height);
+			}
+			return _resultBitmap;
+		}
+		
 		public static void FixImages(string folderpath, bool resaveanyway) {
 			
 
@@ -861,7 +871,7 @@ namespace HigurashiVitaCovnerter {
 						
 						if ((currentFile.Width == 1280 && currentFile.Height == 720) || (currentFile.Width == 1920 && currentFile.Height == 1080)) { // 720p or 1080p is PS3 background
 							Console.Out.WriteLine("(PS3) Background: {0}", fileEntries[i]);
-							Bitmap happy = new Bitmap(currentFile, new Size(ps3BackgroundWidth, ps3BackgroundHeight));
+							Bitmap happy =  goodResizeImage(currentFile, new Size(ps3BackgroundWidth, ps3BackgroundHeight));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
@@ -870,10 +880,10 @@ namespace HigurashiVitaCovnerter {
 							Bitmap happy=null;
 							if (conversionType==type_steam){
 								Console.Out.WriteLine("(Steam) Bust: {0}", fileEntries[i]);
-								happy = new Bitmap(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
+								happy =  goodResizeImage(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
 							}else if (conversionType==type_ps3){
 								Console.Out.WriteLine("(PS3) Bust: {0}", fileEntries[i]);
-								happy = new Bitmap(currentFile, new Size(ps3BustWidth, ps3BustHeight));
+								happy =  goodResizeImage(currentFile, new Size(ps3BustWidth, ps3BustHeight));
 							}
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
@@ -881,7 +891,7 @@ namespace HigurashiVitaCovnerter {
 							doneSomething = true;
 						} else if (currentFile.Width == 1024 && currentFile.Height == 768) { // Idk what this is, make it 640x480 just to be safe
 							Console.Out.WriteLine("(Wierd) Thingie: {0}", fileEntries[i]);
-							Bitmap happy = new Bitmap(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
+							Bitmap happy =  goodResizeImage(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
@@ -891,7 +901,7 @@ namespace HigurashiVitaCovnerter {
 							Console.Out.WriteLine("(Unknown 1920) ???: {0}", fileEntries[i]);
 							//Bitmap happy = new Bitmap(currentFile, new Size(960, (int)Math.Floor((double)currentFile.Height/2)));
 							// We're actually going to save this as a 640x480 because we don't know if this is a sprite or not
-							Bitmap happy = new Bitmap(currentFile, new Size(640, (int)Math.Floor((double)currentFile.Height/3)));
+							Bitmap happy =  goodResizeImage(currentFile, new Size(640, (int)Math.Floor((double)currentFile.Height/3)));
 							
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
@@ -899,14 +909,14 @@ namespace HigurashiVitaCovnerter {
 							doneSomething = true;
 						} else if (currentFile.Width==1024){ // There is a sprite in Tatarigoroshi that scrolls up so it has a huge height. 
 							Console.Out.WriteLine("(Unknown 1024) ???: {0}", fileEntries[i]);
-							Bitmap happy = new Bitmap(currentFile, new Size(640, (int)Math.Floor((double)currentFile.Height/1.6)));
+							Bitmap happy =  goodResizeImage(currentFile, new Size(640, (int)Math.Floor((double)currentFile.Height/1.6)));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
 							doneSomething = true;
 						}else if (currentFile.Width==640 && currentFile.Height==480){
 							Console.Out.WriteLine("(Old) Background/Bust: {0}", fileEntries[i]);
-							Bitmap happy = new Bitmap(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
+							Bitmap happy =  goodResizeImage(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
@@ -919,7 +929,7 @@ namespace HigurashiVitaCovnerter {
 							}else{
 								_tempRatio = ImageToScreenRatio(currentFile.Height,screenHeight);
 							}
-							Bitmap happy = new Bitmap(currentFile, new Size(SizeScaledOutput(currentFile.Width,_tempRatio), SizeScaledOutput(currentFile.Height,_tempRatio)));
+							Bitmap happy =  goodResizeImage(currentFile, new Size(SizeScaledOutput(currentFile.Width,_tempRatio), SizeScaledOutput(currentFile.Height,_tempRatio)));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
@@ -927,7 +937,7 @@ namespace HigurashiVitaCovnerter {
 						}else if (resaveanyway == true) {
 							// Some images don't fade correctly for some reason. I don't know why, but a resave fixes it.
 							Console.Out.WriteLine("(No Reason) Resave: {0}", fileEntries[i]);
-							Bitmap happy = new Bitmap(currentFile, new Size(currentFile.Width, currentFile.Height));
+							Bitmap happy =  goodResizeImage(currentFile, new Size(currentFile.Width, currentFile.Height));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
