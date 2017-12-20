@@ -54,6 +54,34 @@ namespace HigurashiVitaCovnerter {
 			return (int)Math.Floor(_original/(double)_scaleFactor);
 		}
 		
+		string GetProbablePresetFilename(string _scriptsFolderWithSlash, string _presetsFolderWithSlash){
+			string[] _presetFolderEntries = Directory.GetFiles(_presetsFolderWithSlash, "*", SearchOption.AllDirectories);
+			string[] _scriptFolderEntries = Directory.GetFiles(_scriptsFolderWithSlash, "*", SearchOption.AllDirectories);
+			string[] _presetFirstFilenames = new string[_presetFolderEntries.Length];
+			int i;
+			// Get the first script filename from each preset file.
+			for (i=0;i<_presetFolderEntries.Length;i++){
+				StreamReader _myStreamReader = new StreamReader(new FileStream(_presetFolderEntries[i],FileMode.Open));
+				if (int.Parse(_myStreamReader.ReadLine())==0){// First line is the number of script files, we don't need it as long as it's not 0.
+					continue;
+				}
+				_presetFirstFilenames[i] = _myStreamReader.ReadLine();
+				_myStreamReader.Dispose();
+			}
+			for (i=0;i<_scriptFolderEntries.Length;i++){
+				for (int j=0;j<_presetFolderEntries.Length;j++){
+					if (Path.GetFileNameWithoutExtension(_scriptFolderEntries[i])==_presetFirstFilenames[j]){
+						if (i!=_scriptFolderEntries.Length){ // If we actually found something.
+							Console.Out.WriteLine("Detected that this is "+_presetFolderEntries[j]);
+							return _presetFolderEntries[j];
+						}
+					}
+				}
+			}
+			Console.Out.WriteLine("Could not find proper preset.");
+			return null;
+		}
+		
 		public NotStatic(string StreamingAssetsNoEndSlash) {
 			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
 			int _tempAnswer=-1;
@@ -219,16 +247,31 @@ namespace HigurashiVitaCovnerter {
 				sw.Dispose();
 			}
 			
-			//return;
-			
-			// Copyes update to scripts
+			// Copies update to scripts
 			FixScriptFolders(StreamingAssetsNoEndSlash);
+			
+			string probablePresetFilename = GetProbablePresetFilename(StreamingAssetsNoEndSlash+"/Scripts/",Options.includedPresetsFolderName);
+			if (probablePresetFilename==null){
+				DrawDivider();
+				Console.Out.WriteLine("The \"preset file\" for this StreamingAssets folder was not found. You'll need to use manual script selection if you don't fix this problem. Make sure your StreamingAssets/Scripts directorty has scripts. If you can't fix the problem, ask for help.");
+				Console.Out.WriteLine("=== Press any key to continue ===");
+				Console.ReadKey();
+				DrawDivider();
+			}else{ // We know which game this is.
+				// Put the correct preset in the StreamingAssets folder.
+				File.Copy(probablePresetFilename,StreamingAssetsNoEndSlash+"/"+Path.GetFileName(probablePresetFilename),true);
+				StreamWriter _embeddedPresetFilenameFile = new StreamWriter(new FileStream(StreamingAssetsNoEndSlash+"/includedPreset.txt",FileMode.Create));
+				_embeddedPresetFilenameFile.WriteLine(Path.GetFileName(probablePresetFilename));
+				_embeddedPresetFilenameFile.Dispose();
+				// Apply the patch, if it exists.
+				if (File.Exists(Path.Combine(Options.includedPatchesFolderName,Path.GetFileName(probablePresetFilename)+".zip"))){
+					
+				}
+			}
 			
 			Console.Out.WriteLine("========= SCRIPTS START ==========");
 			FixScripts(StreamingAssetsNoEndSlash+"/Scripts/");
-
-			//return;
-
+			
 			Console.Out.WriteLine("========= SCRIPTS DONE ==========");
 			Console.Out.WriteLine("========= PRESETS START =========");
 			if (Directory.Exists(Options.includedPresetsFolderName) == true) {
@@ -316,7 +359,10 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("====== DELETE USELESS STUFF ======");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/assetsreadme.txt");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/update.txt");
-
+			if (probablePresetFilename!=null){
+				Console.Out.WriteLine("====== Rename folder ======");
+				Directory.Move(StreamingAssetsNoEndSlash,StreamingAssetsNoEndSlash+"_"+Path.GetFileName(probablePresetFilename));
+			}
 		}
 		
 		// Returns the number the user put in. -1 otherwise
