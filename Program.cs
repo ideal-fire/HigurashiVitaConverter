@@ -3,11 +3,11 @@ using System.IO;
 
 namespace HigurashiVitaCovnerter {
 	class MainClass {
-		public const string converterVersionString = "v1.6.3"; // DON'T FORGET TO CHANGE converterVersionNumber
-		public const string converterCompileTime = "12/10/17";
+		public const string converterVersionString = "v1.7"; // DON'T FORGET TO CHANGE converterVersionNumber
 		// 3 is v1.2
 		// Version number is usually (x+1) where version string is (v1.x)
-		public const int converterVersionNumber = 8;
+		// 9 is v1.7
+		public const int converterVersionNumber = 9;
 		
 		public static bool IsRunningOnMono(){
 			return Type.GetType ("Mono.Runtime") != null;
@@ -23,7 +23,7 @@ namespace HigurashiVitaCovnerter {
 			}
 			
 			Console.WriteLine("Hello World!");
-			Console.Out.WriteLine("Higurashi-Vita Script Convertrer "+converterVersionString+" ("+converterVersionNumber+") "+converterCompileTime+".");
+			Console.Out.WriteLine("Higurashi-Vita Script Convertrer "+converterVersionString+" ("+converterVersionNumber+")");
 			if (args.Length == 2) {
 				if (args[0].ToLower() == "ps3") {
 					Console.Out.WriteLine("Force PS3 conversion");

@@ -35,6 +35,10 @@ namespace HigurashiVitaCovnerter {
 		
 		public static bool isADVMode=false;
 		
+		const int PLATFORMCHOICE_VITA = 0;
+		const int PLATFORMCHOICE_3DS = 1;
+		const int PLATFORMCHOICE_ANDROID = 2;
+		
 		// Dividing by a smaller number gives a bigger result than dividing by a bigger a number
 		// Whichever one needs to stretch less is the one we stretch to
 		static bool FitToWidth(int _imgWidth, int _imgHeight){
@@ -82,6 +86,17 @@ namespace HigurashiVitaCovnerter {
 			return null;
 		}
 		
+		public string platformChoiceToString(int _userChoice){
+			if (_userChoice == PLATFORMCHOICE_VITA){
+				return "VITA";
+			}else if (_userChoice == PLATFORMCHOICE_3DS){
+				return "3DS";
+			}else if (_userChoice == PLATFORMCHOICE_ANDROID){
+				return "ANDROID";
+			}
+			return "UNKNOWN";
+		}
+		
 		public NotStatic(string StreamingAssetsNoEndSlash) {
 			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
 			int _tempAnswer=-1;
@@ -93,19 +108,19 @@ namespace HigurashiVitaCovnerter {
 				}
 				DrawDivider();
 				Console.Out.WriteLine("What device are you converting files for?");
-				Console.Out.WriteLine("(0) PS Vita");
-				Console.Out.WriteLine("(1) 3ds");
-				Console.Out.WriteLine("(2) Android Device");
+				Console.Out.WriteLine("("+ PLATFORMCHOICE_VITA +") PS Vita");
+				Console.Out.WriteLine("("+ PLATFORMCHOICE_3DS +") 3ds");
+				Console.Out.WriteLine("("+ PLATFORMCHOICE_ANDROID +") Android Device");
 				Console.Out.Write("Answer: ");
 				_tempAnswer = InputNumber();
 			}
 			_userDeviceTarget=_tempAnswer;
 			// Set the resolution for the user if they're on the Vita.
-			if (_tempAnswer==0){
+			if (_tempAnswer==PLATFORMCHOICE_VITA){
 				screenWidth=960;
 				screenHeight=544;
 			}
-			if (_tempAnswer==1){
+			if (_tempAnswer==PLATFORMCHOICE_3DS){
 				screenWidth=400;
 				screenHeight=240;
 			}
@@ -264,8 +279,10 @@ namespace HigurashiVitaCovnerter {
 				_embeddedPresetFilenameFile.WriteLine(Path.GetFileName(probablePresetFilename));
 				_embeddedPresetFilenameFile.Dispose();
 				// Apply the patch, if it exists.
-				if (File.Exists(Path.Combine(Options.includedPatchesFolderName,Path.GetFileName(probablePresetFilename)+".zip"))){
-					
+				if (Directory.Exists(Path.Combine(Options.includedPatchesFolderName,Path.GetFileName(probablePresetFilename)+(conversionType == type_ps3 ? "PS3" : "NORMAL")+platformChoiceToString(_userDeviceTarget)))){
+					CopyDirToDir(Path.Combine(Options.includedPatchesFolderName,Path.GetFileName(probablePresetFilename)+(conversionType == type_ps3 ? "PS3" : "NORMAL")+platformChoiceToString(_userDeviceTarget)),StreamingAssetsNoEndSlash);
+				}else if (Directory.Exists(Path.Combine(Options.includedPatchesFolderName,Path.GetFileName(probablePresetFilename)+(conversionType == type_ps3 ? "PS3" : "NORMAL")+"ALL"))){
+					CopyDirToDir(Path.Combine(Options.includedPatchesFolderName,Path.GetFileName(probablePresetFilename)+(conversionType == type_ps3 ? "PS3" : "NORMAL")+"ALL"),StreamingAssetsNoEndSlash);
 				}
 			}
 			
@@ -360,8 +377,32 @@ namespace HigurashiVitaCovnerter {
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/assetsreadme.txt");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/update.txt");
 			if (probablePresetFilename!=null){
+				bool _actuallyDidRename=false;
 				Console.Out.WriteLine("====== Rename folder ======");
-				Directory.Move(StreamingAssetsNoEndSlash,StreamingAssetsNoEndSlash+"_"+Path.GetFileName(probablePresetFilename));
+				for (int i=0;i!=20;i++){
+					try{
+						Directory.Move(StreamingAssetsNoEndSlash,StreamingAssetsNoEndSlash+"_"+Path.GetFileName(probablePresetFilename));
+						i=19;
+						_actuallyDidRename=true;
+					}catch(Exception e){
+						Console.Out.WriteLine("Failed to rename StreamingAssets directory, retrying "+i+"/20");
+						Thread.Sleep(500);
+					}
+				}
+				if (_actuallyDidRename==false){
+					DrawDivider();
+					DrawDivider();
+					DrawDivider();
+					Console.Out.WriteLine("Okay, so I failed to rename the StreamingAssets folder. You're probably using it, or something. What you need to do is....\n");
+					
+					Console.Out.WriteLine("rename StreamingAssets to StreamingAssets_"+Path.GetFileName(probablePresetFilename));
+					
+					Console.Out.WriteLine("\nMake sure you do it.");
+					Console.Out.WriteLine("=== Press enter twice to continue ===");
+					Console.ReadLine();
+					Console.ReadLine();
+				}
+				
 			}
 		}
 		
