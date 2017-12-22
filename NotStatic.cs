@@ -376,7 +376,7 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("====== DELETE USELESS STUFF ======");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/assetsreadme.txt");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/update.txt");
-			if (probablePresetFilename!=null){
+			if (probablePresetFilename!=null && _userDeviceTarget == PLATFORMCHOICE_3DS){
 				bool _actuallyDidRename=false;
 				Console.Out.WriteLine("====== Rename folder ======");
 				for (int i=0;i!=20;i++){
@@ -384,7 +384,7 @@ namespace HigurashiVitaCovnerter {
 						Directory.Move(StreamingAssetsNoEndSlash,StreamingAssetsNoEndSlash+"_"+Path.GetFileName(probablePresetFilename));
 						i=19;
 						_actuallyDidRename=true;
-					}catch(Exception e){
+					}catch{
 						Console.Out.WriteLine("Failed to rename StreamingAssets directory, retrying "+i+"/20");
 						Thread.Sleep(500);
 					}
