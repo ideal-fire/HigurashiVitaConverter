@@ -293,7 +293,7 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("========= PRESETS START =========");
 			if (Directory.Exists(Options.includedPresetsFolderName) == true) {
 				// Only copy presets if it's PS Vita
-				if (_userDeviceTarget==0){
+				if (_userDeviceTarget==PLATFORMCHOICE_VITA){
 					Directory.CreateDirectory(StreamingAssetsNoEndSlash + "/Presets");
 					CopyPresets(StreamingAssetsNoEndSlash);
 				}
@@ -376,7 +376,7 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("====== DELETE USELESS STUFF ======");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/assetsreadme.txt");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/update.txt");
-			if (probablePresetFilename!=null && _userDeviceTarget == PLATFORMCHOICE_3DS){
+			if (probablePresetFilename!=null){
 				bool _actuallyDidRename=false;
 				Console.Out.WriteLine("====== Rename folder ======");
 				for (int i=0;i!=20;i++){
