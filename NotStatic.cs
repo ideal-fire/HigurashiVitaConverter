@@ -266,7 +266,7 @@ namespace HigurashiVitaCovnerter {
 			FixScriptFolders(StreamingAssetsNoEndSlash);
 			
 			string probablePresetFilename = GetProbablePresetFilename(StreamingAssetsNoEndSlash+"/Scripts/",Options.includedPresetsFolderName);
-			if (probablePresetFilename==null){
+			if (probablePresetFilename==null && _userDeviceTarget==PLATFORMCHOICE_3DS){
 				DrawDivider();
 				Console.Out.WriteLine("The \"preset file\" for this StreamingAssets folder was not found. You'll need to use manual script selection if you don't fix this problem. Make sure your StreamingAssets/Scripts directorty has scripts. If you can't fix the problem, ask for help.");
 				Console.Out.WriteLine("=== Press any key to continue ===");
@@ -376,7 +376,7 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("====== DELETE USELESS STUFF ======");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/assetsreadme.txt");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/update.txt");
-			if (probablePresetFilename!=null){
+			if (probablePresetFilename!=null && _userDeviceTarget == PLATFORMCHOICE_3DS){
 				bool _actuallyDidRename=false;
 				Console.Out.WriteLine("====== Rename folder ======");
 				for (int i=0;i!=20;i++){
@@ -1036,7 +1036,7 @@ namespace HigurashiVitaCovnerter {
 					if (doneSomething==false){
 						Console.Out.WriteLine("(No Need) Ignored: {0}", fileEntries[i]);
 					}
-				};
+				}
 			}
 		}
 
