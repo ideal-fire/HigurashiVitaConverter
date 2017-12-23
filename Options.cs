@@ -22,5 +22,7 @@ namespace HigurashiVitaCovnerter
 		public static bool promptADVMode = true;
 		
 		public const string includedPatchesFolderName = "./Patches/";
+	
+		public const bool doOtherScalingMethod = false;
 	}
 }

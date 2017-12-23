@@ -925,12 +925,16 @@ namespace HigurashiVitaCovnerter {
 		
 		
 		public static Bitmap goodResizeImage(Bitmap _sourceImage, Size _newSize){
-			Bitmap _resultBitmap = new Bitmap(_newSize.Width,_newSize.Height);
-			using (Graphics goodGraphics = Graphics.FromImage(_resultBitmap)){
-                goodGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-                goodGraphics.DrawImage(_sourceImage,0,0,_newSize.Width,_newSize.Height);
+			if (Options.doOtherScalingMethod){
+				Bitmap _resultBitmap = new Bitmap(_newSize.Width,_newSize.Height);
+				using (Graphics goodGraphics = Graphics.FromImage(_resultBitmap)){
+       	         goodGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+       	         goodGraphics.DrawImage(_sourceImage,0,0,_newSize.Width,_newSize.Height);
+				}
+				return _resultBitmap;
+			}else{
+				return new Bitmap(_sourceImage,_newSize.Width,_newSize.Height);
 			}
-			return _resultBitmap;
 		}
 		
 		public static void FixImages(string folderpath, bool resaveanyway) {
