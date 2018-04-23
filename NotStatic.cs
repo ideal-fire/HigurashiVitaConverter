@@ -292,11 +292,11 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("========= SCRIPTS DONE ==========");
 			Console.Out.WriteLine("========= PRESETS START =========");
 			if (Directory.Exists(Options.includedPresetsFolderName) == true) {
-				// Only copy presets if it's PS Vita
-				if (_userDeviceTarget==PLATFORMCHOICE_VITA){
-					Directory.CreateDirectory(StreamingAssetsNoEndSlash + "/Presets");
-					CopyPresets(StreamingAssetsNoEndSlash);
-				}
+				//// Only copy presets if it's PS Vita
+				//if (_userDeviceTarget==PLATFORMCHOICE_VITA){
+				//	Directory.CreateDirectory(StreamingAssetsNoEndSlash + "/Presets");
+				//	CopyPresets(StreamingAssetsNoEndSlash);
+				//}
 			} else {
 				Console.WriteLine("!!!!!!!!!! WARNINING !!!!!!!!!!!!!");
 				Console.Out.WriteLine("The folder \"Presets\" was not found in the same directory as this exe.\nIf you have misplaced the folder, please redownload the program.\nIf you ignore this warning, your StreamingAssets folder will have no presets in it by default.\nYou'll need to put them all in yourself.");
@@ -376,7 +376,7 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("====== DELETE USELESS STUFF ======");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/assetsreadme.txt");
 			DeleteIfExist(StreamingAssetsNoEndSlash+"/update.txt");
-			if (probablePresetFilename!=null && _userDeviceTarget == PLATFORMCHOICE_3DS){
+			if (probablePresetFilename!=null){
 				bool _actuallyDidRename=false;
 				Console.Out.WriteLine("====== Rename folder ======");
 				for (int i=0;i!=20;i++){
@@ -928,8 +928,8 @@ namespace HigurashiVitaCovnerter {
 			if (Options.doOtherScalingMethod){
 				Bitmap _resultBitmap = new Bitmap(_newSize.Width,_newSize.Height);
 				using (Graphics goodGraphics = Graphics.FromImage(_resultBitmap)){
-       	         goodGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
-       	         goodGraphics.DrawImage(_sourceImage,0,0,_newSize.Width,_newSize.Height);
+					goodGraphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBilinear;
+					goodGraphics.DrawImage(_sourceImage,0,0,_newSize.Width,_newSize.Height);
 				}
 				return _resultBitmap;
 			}else{
@@ -1012,19 +1012,6 @@ namespace HigurashiVitaCovnerter {
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
 							doneSomething = true;
-						}else if (Options.isSecretFeature==true && currentFile.Width==800 && currentFile.Height==600){
-							Console.Out.WriteLine("(Test Game) Image: {0}", fileEntries[i]);
-							double _tempRatio;
-							if (FitToWidth(currentFile.Width,currentFile.Height)==true){
-								_tempRatio = ImageToScreenRatio(currentFile.Width,screenWidth);
-							}else{
-								_tempRatio = ImageToScreenRatio(currentFile.Height,screenHeight);
-							}
-							Bitmap happy =  goodResizeImage(currentFile, new Size(SizeScaledOutput(currentFile.Width,_tempRatio), SizeScaledOutput(currentFile.Height,_tempRatio)));
-							currentFile.Dispose();
-							happy.Save(fileEntries[i]);
-							happy.Dispose();
-							doneSomething = true;
 						}else if (resaveanyway == true) {
 							// Some images don't fade correctly for some reason. I don't know why, but a resave fixes it.
 							Console.Out.WriteLine("(No Reason) Resave: {0}", fileEntries[i]);
@@ -1034,8 +1021,6 @@ namespace HigurashiVitaCovnerter {
 							happy.Dispose();
 							doneSomething = true;
 						}
-			
-
 					}
 					if (doneSomething==false){
 						Console.Out.WriteLine("(No Need) Ignored: {0}", fileEntries[i]);

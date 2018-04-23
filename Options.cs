@@ -14,15 +14,9 @@ namespace HigurashiVitaCovnerter
 	{
 		// Should the user be asked about downloading the latets scripts?
 		public static bool downloadLatestScripts=false;
-		
 		public const string includedPresetsFolderName = "./Presets/";
-		
-		public static bool isSecretFeature = false;
-		
 		public static bool promptADVMode = true;
-		
 		public const string includedPatchesFolderName = "./Patches/";
-	
 		public const bool doOtherScalingMethod = false;
 	}
 }
