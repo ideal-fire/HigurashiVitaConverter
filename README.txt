@@ -4,10 +4,10 @@ Please use this C# program to convert the game assets to work with Higurashi-Vit
 		http://www.mono-project.com/
 
 To use this, place the StreamingAssets folder from any Higurashi game in the same folder as the exe and run it.
-After it says the conversion is done, place the StreamingAssets folder at ux0:data/HIGURASHI/StreamingAsstes.
+After it says the conversion is done, place the StreamingAssets folder inside ux0:data/HIGURASHI/Games/ or...I think /3ds/data/HIGURASHI/Games/.
 
 Video tutorial:
-https://www.youtube.com/watch?v=0T8cxjXwwww
+https://youtu.be/HywSh8If6_A
 
 Wololo thread with more detailed instructions:
 http://wololo.net/talk/viewtopic.php?f=116&t=48223
