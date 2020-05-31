@@ -23,7 +23,7 @@ namespace HigurashiVitaCovnerter {
 			}
 			
 			Console.WriteLine("Hello World!");
-			Console.Out.WriteLine("Higurashi-Vita Script Convertrer "+converterVersionString+" ("+converterVersionNumber+")");
+			Console.Out.WriteLine("Higurashi-Vita Script Converter "+converterVersionString+" ("+converterVersionNumber+")");
 			if (args.Length == 2) {
 				if (args[0].ToLower() == "ps3") {
 					Console.Out.WriteLine("Force PS3 conversion");
