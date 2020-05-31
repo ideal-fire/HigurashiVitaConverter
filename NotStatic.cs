@@ -38,6 +38,8 @@ namespace HigurashiVitaCovnerter {
 		const int PLATFORMCHOICE_VITA = 0;
 		const int PLATFORMCHOICE_3DS = 1;
 		const int PLATFORMCHOICE_ANDROID = 2;
+
+		int _userDeviceTarget;
 		
 		// Dividing by a smaller number gives a bigger result than dividing by a bigger a number
 		// Whichever one needs to stretch less is the one we stretch to
@@ -100,7 +102,6 @@ namespace HigurashiVitaCovnerter {
 		public NotStatic(string StreamingAssetsNoEndSlash) {
 			string[] folderEntries = Directory.GetDirectories(StreamingAssetsNoEndSlash);
 			int _tempAnswer=-1;
-			int _userDeviceTarget;
 			while (_tempAnswer<0 || _tempAnswer>2 ){
 				if (_tempAnswer>2){
 					DrawDivider();
@@ -764,7 +765,21 @@ namespace HigurashiVitaCovnerter {
 		}
 		
 		
-		public static Bitmap goodResizeImage(Bitmap _sourceImage, Size _newSize){
+		public Bitmap goodResizeImage(Bitmap _sourceImage, Size _newSize){
+			if (_userDeviceTarget==PLATFORMCHOICE_VITA){
+				// shrink a bit if bigger than vita max size.
+				if (_newSize.Width>4096){
+					_newSize.Height=(int)(_newSize.Height*(4096/(double)_newSize.Width));
+					_newSize.Width=4096;
+					Console.WriteLine("cap texture size (w)");
+				}
+				if (_newSize.Height>4096){
+					_newSize.Width=(int)(_newSize.Width*(4096/(double)_newSize.Height));
+					_newSize.Height=4096;
+					Console.WriteLine("cap texture size (h)");
+				}
+			}
+			
 			if (Options.doOtherScalingMethod){
 				Bitmap _resultBitmap = new Bitmap(_newSize.Width,_newSize.Height);
 				using (Graphics goodGraphics = Graphics.FromImage(_resultBitmap)){
@@ -777,9 +792,7 @@ namespace HigurashiVitaCovnerter {
 			}
 		}
 		
-		public static void FixImages(string folderpath, bool resaveanyway) {
-			
-
+		public void FixImages(string folderpath, bool resaveanyway) {
 			resaveanyway = true;
 
 			//string[] fileEntries = Directory.GetFiles(folderpath);
