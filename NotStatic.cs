@@ -533,6 +533,10 @@ namespace HigurashiVitaCovnerter {
 				//Console.Out.WriteLine("Line " + i.ToString());
 				tabsOnLines[i] = (short)GetNumberOfTabsAtStart(lines[i]);
 				line = lines[i].TrimStart((char)09);
+
+				if (line.StartsWith("#include")){
+					line="";
+				}
 				
 				if (isADVMode==false){
 					// This WILL change in the future. 
