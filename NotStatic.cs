@@ -262,7 +262,7 @@ namespace HigurashiVitaCovnerter {
 			FixScriptFolders(StreamingAssetsNoEndSlash);
 			
 			string probablePresetFilename = GetProbablePresetFilename(StreamingAssetsNoEndSlash+"/Scripts/",Options.includedPresetsFolderName);
-			if (probablePresetFilename==null && _userDeviceTarget==PLATFORMCHOICE_3DS){
+			if (probablePresetFilename==null){
 				DrawDivider();
 				Console.Out.WriteLine("The \"preset file\" for this StreamingAssets folder was not found. You'll need to use manual script selection if you don't fix this problem. Make sure your StreamingAssets/Scripts directorty has scripts. If you can't fix the problem, ask for help.");
 				Console.Out.WriteLine("=== Press any key to continue ===");
@@ -561,6 +561,8 @@ namespace HigurashiVitaCovnerter {
 						if (line.IndexOf('[') != -1) {
 							Console.Out.WriteLine("Fix char array "+line.Substring(5, line.IndexOf('[') - 5));
 							line = line.Substring(5, line.IndexOf('[') - 5) + " = {}";
+						}else{ // it's a string variable declaration
+							line = "local "+line.Substring(4);
 						}
 					}else if (line.Substring(0,3)=="int"){
 						line = "local "+line.Substring(3);
