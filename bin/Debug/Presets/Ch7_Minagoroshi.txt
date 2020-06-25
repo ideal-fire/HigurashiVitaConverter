@@ -1,0 +1,144 @@
+037
+_mina_op
+_mina_001
+_mina_002_1
+_mina_002_2
+_mina_003_1
+_mina_003_2
+_mina_004
+_mina_005
+_mina_006
+_mina_007
+_mina_008
+_mina_009_1
+_mina_009_2
+_mina_010
+_mina_011_1
+_mina_011_2
+_mina_012
+_mina_013
+_mina_014
+_mina_015_1
+_mina_015_2
+_mina_016
+_mina_017
+_mina_018
+_mina_019
+_mina_020
+_mina_021
+_mina_022
+_mina_023_1
+_mina_023_2
+_mina_024
+_mina_025
+_mina_026
+_mina_027
+_mina_028
+_mina_ep
+staffroom
+013
+_mina_tips_001
+_mina_tips_002
+_mina_tips_003
+_mina_tips_004
+_mina_tips_005
+_mina_tips_006
+_mina_tips_007
+_mina_tips_008
+_mina_tips_009
+_mina_tips_010
+_mina_tips_011
+_mina_tips_012
+_mina_tips_013
+037
+000
+001
+001
+002
+002
+002
+002
+003
+003
+003
+004
+004
+004
+005
+005
+005
+007
+007
+009
+009
+009
+010
+010
+010
+010
+011
+011
+011
+011
+011
+012
+012
+012
+012
+012
+013
+013
+tipnames
+013
+To my granddaughter
+Good times with Oyashiro-sama
+The Two of Us
+Before the Flight
+Wet Blanket
+Receptionist's note
+The Bankbook Frustration
+No relations
+Sending the Brat Back
+A Civil Servant's Preparations
+A discoloured notebook
+Another discoloured notebook
+This Fragment's End
+chapternames
+037
+Minagoroshi Opening
+Minagoroshi Day 1
+Minagoroshi Day 2-1
+Minagoroshi Day 2-2
+Minagoroshi Day 3-1
+Minagoroshi Day 3-2
+Minagoroshi Day 4
+Minagoroshi Day 5
+Minagoroshi Day 6
+Minagoroshi Day 7
+Minagoroshi Day 8
+Minagoroshi Day 9-1
+Minagoroshi Day 9-2
+Minagoroshi Day 10
+Minagoroshi Day 11-1
+Minagoroshi Day 11-2
+Minagoroshi Day 12
+Minagoroshi Day 13
+Minagoroshi Day 14
+Minagoroshi Day 15-1
+Minagoroshi Day 15-2
+Minagoroshi Day 16
+Minagoroshi Day 17
+Minagoroshi Day 18
+Minagoroshi Day 19
+Minagoroshi Day 20
+Minagoroshi Day 21
+Minagoroshi Day 22
+Minagoroshi Day 23-1
+Minagoroshi Day 23-2
+Minagoroshi Day 24
+Minagoroshi Day 25
+Minagoroshi Day 26
+Minagoroshi Day 27
+Minagoroshi Day 28
+Minagoroshi Ending
+Minagoroshi Staff Room
