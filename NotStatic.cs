@@ -584,21 +584,20 @@ namespace HigurashiVitaCovnerter {
 				}
 				// Fix things that should be string args.
 				if (line.Length >= 13) {
-					if ((line.Substring(0, 13) == "SetGlobalFlag" || line.IndexOf("GetGlobalFlag")!=-1) || (line.Length>=22 && line.IndexOf("LoadValueFromLocalWork")!=-1)) {
-						int start = 3;
-						if (line.Substring(0, 13) == "SetGlobalFlag") {
-							start = 0;
-						} else if (line.IndexOf("GetGlobalFlag") != -1) {
-							start = line.IndexOf("GetGlobalFlag");
-						} else if (line.IndexOf("LoadValueFromLocalWork") != -1) {
-							start = line.IndexOf("LoadValueFromLocalWork");
-						}
+					if (line.IndexOf("SetGlobalFlag")!=-1 || line.IndexOf("GetGlobalFlag")!=-1 || line.IndexOf("LoadValueFromLocalWork")!=-1 || line.IndexOf("GetLocalFlag")!=-1 || line.IndexOf("SetLocalFlag")!=-1) {
 						line = line.Replace(" ", "");
-						int startleft = line.IndexOf('(');
-						if (startleft < start) {
-							startleft = line.IndexOf('(', startleft+1);
+						int start = line.IndexOf("SetGlobalFlag");
+						if (start==-1){
+							start=line.IndexOf("GetGlobalFlag");
+						}if (start==-1){
+							start=line.IndexOf("LoadValueFromLocalWork");
+						}if (start==-1){
+							start=line.IndexOf("GetLocalFlag");
+						}if (start==-1){
+							start=line.IndexOf("SetLocalFlag");
 						}
-						int firstargend = line.IndexOf(',');
+						int startleft = line.IndexOf('(',start);
+						int firstargend = line.IndexOf(',',startleft);
 						if (firstargend == -1) {
 							firstargend = line.IndexOf(')', startleft + 1);
 						}
