@@ -757,9 +757,13 @@ namespace HigurashiVitaCovnerter {
 				lines[i] = line;
 				lastLine = lines[i];
 			}
-
 			File.WriteAllLines(filename, lines);
-
+			if (marked == false) {
+				StreamWriter s = File.AppendText(filename);
+				s.WriteLine("//MyLegGuyisanoob");
+				Console.Out.WriteLine("Marked script as done.");
+				s.Dispose();
+			}
 			Console.Out.WriteLine("(Done)");
 		}
 

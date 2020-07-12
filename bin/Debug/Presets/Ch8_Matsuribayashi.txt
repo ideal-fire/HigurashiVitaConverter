@@ -70,7 +70,7 @@ NAME-_mats_005
 NAME-_mats_006
 NAME-_mats_007
 NAME-_mats_008
-NAME-.\/hidden
+.\/hidden
 NAME-_mats_009
 NAME-_mats_010
 NAME-_mats_011
