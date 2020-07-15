@@ -335,11 +335,11 @@ namespace HigurashiVitaCovnerter {
 			for (int i = 0; i < folderEntries.Length; i++) {
 				//if (type == type_ps3) {
 					if (Path.GetFileNameWithoutExtension(folderEntries[i]) == "CG") {
-						FixImages(folderEntries[i], false);
+						FixImages(folderEntries[i]);
 					}
 				//} else if (type == type_updated) {
 					if (Path.GetFileNameWithoutExtension(folderEntries[i]) == "CGAlt") {
-						FixImages(folderEntries[i], false);
+						FixImages(folderEntries[i]);
 					}
 				//}
 
@@ -801,14 +801,11 @@ namespace HigurashiVitaCovnerter {
 			}
 		}
 		
-		public void FixImages(string folderpath, bool resaveanyway) {
-			resaveanyway = true;
+		public void FixImages(string folderpath) {
 
 			//string[] fileEntries = Directory.GetFiles(folderpath);
 			string[] fileEntries = Directory.GetFiles(folderpath, "*.*", SearchOption.AllDirectories);
 			for (int i = 0; i < fileEntries.Length; i++) {
-				bool doneSomething=false;
-				
 				if (Path.GetExtension(fileEntries[i])!=".png"){
 					Console.Out.WriteLine("(Ignored) Not PNG: {0}",fileEntries[i]);
 					continue;
@@ -828,7 +825,6 @@ namespace HigurashiVitaCovnerter {
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
-							doneSomething = true;
 						}else if (currentFile.Width == 1280 && currentFile.Height == 960) { // 960p is a character bust
 							Bitmap happy=null;
 							if (conversionType==type_steam){
@@ -841,14 +837,12 @@ namespace HigurashiVitaCovnerter {
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
-							doneSomething = true;
 						} else if (currentFile.Width == 1024 && currentFile.Height == 768) { // Idk what this is, make it 640x480 just to be safe
 							Console.Out.WriteLine("(Wierd) Thingie: {0}", fileEntries[i]);
 							Bitmap happy =  goodResizeImage(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
-							doneSomething = true;
 						} else if (currentFile.Width==1920){ // Unknown. 
 							
 							Console.Out.WriteLine("(Unknown 1920) ???: {0}", fileEntries[i]);
@@ -859,37 +853,35 @@ namespace HigurashiVitaCovnerter {
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
-							doneSomething = true;
 						} else if (currentFile.Width==1024){ // There is a sprite in Tatarigoroshi that scrolls up so it has a huge height. 
 							Console.Out.WriteLine("(Unknown 1024) ???: {0}", fileEntries[i]);
 							Bitmap happy =  goodResizeImage(currentFile, new Size(640, (int)Math.Floor((double)currentFile.Height/1.6)));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
-							doneSomething = true;
 						}else if (currentFile.Width==640 && currentFile.Height==480){
 							Console.Out.WriteLine("(Old) Background/Bust: {0}", fileEntries[i]);
 							Bitmap happy =  goodResizeImage(currentFile, new Size(normalBustBackgroundWidth, normalBustBackgroundHeight));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
-							doneSomething = true;
-						}else if (resaveanyway == true) {
+						}else if (currentFile.Width==1280){
+							Console.Out.WriteLine("(Unknown 1280) ???: {0}", fileEntries[i]);
+							Bitmap happy =  goodResizeImage(currentFile, new Size(normalBustBackgroundWidth, (int)Math.Floor(currentFile.Height/(currentFile.Width/(double)normalBustBackgroundWidth))));
+							currentFile.Dispose();
+							happy.Save(fileEntries[i]);
+							happy.Dispose();
+						}else{
 							// Some images don't fade correctly for some reason. I don't know why, but a resave fixes it.
 							Console.Out.WriteLine("(No Reason) Resave: {0}", fileEntries[i]);
 							Bitmap happy =  goodResizeImage(currentFile, new Size(currentFile.Width, currentFile.Height));
 							currentFile.Dispose();
 							happy.Save(fileEntries[i]);
 							happy.Dispose();
-							doneSomething = true;
 						}
-					}
-					if (doneSomething==false){
-						Console.Out.WriteLine("(No Need) Ignored: {0}", fileEntries[i]);
 					}
 				}
 			}
 		}
-
 	}
 }
