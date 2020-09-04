@@ -26,7 +26,7 @@ namespace HigurashiVitaCovnerter {
 			
 			Console.WriteLine("Hello World!");
 			Console.Out.WriteLine("Higurashi-Vita Script Converter "+converterVersionString+" ("+converterVersionNumber+")");
-			if (args.Length == 2) {
+			if (args.Length == 1) {
 				if (args[0].ToLower() == "ps3") {
 					Console.Out.WriteLine("Force PS3 conversion");
 					NotStatic.conversionType = NotStatic.type_ps3;
@@ -37,6 +37,9 @@ namespace HigurashiVitaCovnerter {
 					Console.Out.WriteLine("Unknown command line argument "+args[0]);
 					NotStatic.conversionType = NotStatic.type_undefined;
 				}
+			}else if (args.Length==2 && args[0]=="fixscript"){
+				NotStatic.FixSpecificScript(args[1]);
+				return;
 			}
 
 			if (Directory.Exists("./StreamingAssets") == false){

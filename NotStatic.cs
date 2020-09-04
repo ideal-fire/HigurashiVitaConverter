@@ -494,7 +494,7 @@ namespace HigurashiVitaCovnerter {
 			}
 		}
 
-		string AddLastArg(string tofix) {
+		static string AddLastArg(string tofix) {
 			if (tofix.Substring(tofix.Length-4,4)==", );"){
 				tofix = tofix.Substring(0, tofix.Length - 2);
 				tofix += "0 );";
@@ -503,7 +503,7 @@ namespace HigurashiVitaCovnerter {
 			return tofix;
 		}
 		
-		short GetNumberOfTabsAtStart(string line){
+		static short GetNumberOfTabsAtStart(string line){
 			for (short i=0;i<line.Length;i++){
 				if (line.Substring(i,1)!=(""+(char)09)){
 					return i;
@@ -512,7 +512,7 @@ namespace HigurashiVitaCovnerter {
 			return (short)line.Length;
 		}
 		
-		string ChangeIfHere(string tomod, string evil_stuff_we_dont_want, string fresh_stuff_we_do_want){
+		static string ChangeIfHere(string tomod, string evil_stuff_we_dont_want, string fresh_stuff_we_do_want){
 			if (tomod.TrimStart((char)09)==evil_stuff_we_dont_want){
 				return (char)09+fresh_stuff_we_do_want;
 			}else{
@@ -520,7 +520,7 @@ namespace HigurashiVitaCovnerter {
 			}
 		}
 
-		void FixSpecificScript(string filename) {
+		public static void FixSpecificScript(string filename) {
 			Console.Out.WriteLine("(All) Script: {0}",filename);
 			//string[] lines;
 			string[] lines = File.ReadAllLines(filename);
@@ -767,7 +767,7 @@ namespace HigurashiVitaCovnerter {
 			Console.Out.WriteLine("(Done)");
 		}
 
-		string SingleStringReplacePosition(string original, string tofind,string newthing, int minoffset){
+		static string SingleStringReplacePosition(string original, string tofind,string newthing, int minoffset){
 			int cpos = original.IndexOf(tofind);
 			original = original.Substring(0,cpos)+newthing+original.Substring(cpos+1,original.Length-(cpos+1));
 			return original;
